@@ -1,8 +1,17 @@
 package io.kokuwa.edge.esh.constants.maven.plugin;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import io.kokuwa.edge.esh.constants.maven.plugin.junit.MojoExtension;
 import io.kokuwa.edge.esh.constants.maven.plugin.junit.MojoProperty;
 import io.kokuwa.edge.esh.constants.maven.plugin.junit.SystemPropertyExtension;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -19,7 +28,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class GenerateConstantsMojoTest {
 
 	@Test
-	public void verfiyGeneration(GenerateConstantsMojo mojo) {
+	public void verfiyGeneration(GenerateConstantsMojo mojo)
+			throws MojoFailureException, MojoExecutionException, IOException, URISyntaxException
+	{
+		Path outputDirectory = Files.createTempDirectory("esh-constants-test");
+		mojo.setOutputDirectory(outputDirectory.toString());
+		mojo.execute();
 
+		String result = new String(Files.readAllBytes(Path.of(outputDirectory.toString(), "Constants.java")));
+		String expected = new String(Files.readAllBytes(Paths.get(ClassLoader.getSystemResource("expected.java").toURI())));
+
+		Assertions.assertNotNull(result, "Result must be generated.");
+		Assertions.assertNotNull(expected, "Expected result must be found.");
+
+		Assertions.assertEquals(expected, result, "Generated result must match expected file.");
 	}
 }
