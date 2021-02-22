@@ -1,0 +1,19 @@
+<component-set>
+	<components>
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>esh-constants</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+			<configuration>
+				<lifecycles>
+					<lifecycle>
+						<id>default</id>
+						<phases>
+							<deploy>io.kokuwa.edge:esh-constants-maven-plugin:generate-esh-constants</deploy>
+						</phases>
+					</lifecycle>
+				</lifecycles>
+			</configuration>
+		</component>
+	</components>
+</component-set>
