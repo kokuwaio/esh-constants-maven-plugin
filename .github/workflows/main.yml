@@ -30,4 +30,4 @@ jobs:
       - name: version
         run: mvn -B versions:set -DnewVersion=${{ env.mainVersion }}
       - name: deploy
-        run: mvn -B deploy -Pgithub
+        run: mvn -B deploy -Dcheckstyle.skip -Pgithub

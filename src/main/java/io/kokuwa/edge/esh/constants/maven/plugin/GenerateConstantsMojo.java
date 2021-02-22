@@ -67,7 +67,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		final Map<String, String> constants = new HashMap<>();
 
 		// Grep constants
-		for(Path inputFile : inputFiles) {
+		for (Path inputFile : inputFiles) {
 			constants.putAll(getConstants(inputFile.toFile(),
 					"//bridge-type/@id",
 					"BRIDGE_TYPE_ID_"));
@@ -109,6 +109,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	private Map<String, String> getConstants(File file, String expression, String prefix)
 			throws MojoExecutionException
 	{
+
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			final DocumentBuilder builder = factory.newDocumentBuilder();
