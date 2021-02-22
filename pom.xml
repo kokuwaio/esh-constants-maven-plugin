@@ -46,18 +46,6 @@
 		<url>https://github.com/kokuwaio/esh-constants-maven-plugin/tree/master</url>
 		<tag>HEAD</tag>
 	</scm>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype-nexus</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype-nexus</id>
-			<name>Nexus Release Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
 
 	<properties>
 		<maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
@@ -133,4 +121,37 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>github</id>
+			<activation>
+				<property>
+					<name>GITHUB_RUN_NUMBER</name>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<id>central</id>
+					<name>Maven Central</name>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<url>https://repo1.maven.org/maven2/</url>
+				</repository>
+				<repository>
+					<id>github</id>
+					<name>GitHub Kokuwa.io Apache Maven Packages</name>
+					<url>https://maven.pkg.github.com/kokuwaio/esh-constants-maven-plugin</url>
+				</repository>
+			</repositories>
+			<distributionManagement>
+				<repository>
+					<id>github</id>
+					<name>GitHub Kokuwa.io Apache Maven Packages</name>
+					<url>https://maven.pkg.github.com/kokuwaio/esh-constants-maven-plugin</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+	</profiles>
 </project>

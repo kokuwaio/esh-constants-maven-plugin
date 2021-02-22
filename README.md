@@ -1,5 +1,7 @@
 # ESH Constants Generator Maven Plugin
 
+![Main Workflow State](https://github.com/kokuwaio/esh-constants-maven-plugin/workflows/Main/badge.svg)
+
 ## What?
 
 This plugin generates a Java constants class with all namings defined in the `ESH_INF` folder files.

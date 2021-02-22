@@ -1,0 +1,33 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - 'main'
+
+env:
+  mainVersion: 0.1.${GITHUB_RUN_NUMBER}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: setup
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: settings
+        uses: s4u/maven-settings-action@v2.3.0
+        with:
+          servers: |
+            [{
+                "id": "github",
+                "username": "fabian-schlegel",
+                "password": "${{ secrets.GITHUB_TOKEN }}"
+            }]
+      - name: version
+        run: mvn -B versions:set -DnewVersion=${{ env.mainVersion }}
+      - name: deploy
+        run: mvn -B deploy -Pgithub
