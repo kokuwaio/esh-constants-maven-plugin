@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,8 +24,10 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -61,36 +64,60 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	private String className;
 
 	@Override
-	public void execute() throws MojoExecutionException {
+	public void execute() throws MojoExecutionException, MojoFailureException {
 
 		// Create output directory
 		createOutputDirectory();
 
 		// Get input file list
 		final Set<Path> inputFiles = findXMLFiles();
-		final Map<String, String> constants = new HashMap<>();
+		final Map<String, String> constants = new TreeMap<>();
+		final Map<String, String> uids = new TreeMap<>();
+
+		String bindingId = StringUtils.EMPTY;
+		Map<String, String> bindingIDs = new HashMap<>();
+		Map<String, String> thingTypeIDs = new HashMap<>();
+		Map<String, String> bridgeTypeIDs = new HashMap<>();
+		Map<String, String> channelGroupTypeIDs = new HashMap<>();
+		Map<String, String> channelTypeIDs = new HashMap<>();
 
 		// Grep constants
 		for (Path inputFile : inputFiles) {
-			constants.putAll(getConstants(inputFile.toFile(),
-					"//bridge-type/@id",
-					"BRIDGE_TYPE_ID_"));
-			constants.putAll(getConstants(inputFile.toFile(),
-					"//channel-group-type/@id",
-					"CHANNEL_GROUP_TYPE_ID_"));
-			constants.putAll(getConstants(inputFile.toFile(),
-					"//channel-type/@id",
-					"CHANNEL_TYPE_ID_"));
-			constants.putAll(getConstants(inputFile.toFile(),
-					"//thing-type/@id",
-					"THING_TYPE_ID_"));
-			constants.putAll(getConstants(inputFile.toFile(),
+			bindingIDs.putAll(getConstants(inputFile.toFile(),
 					"//thing-descriptions/@bindingId",
 					"BINDING_ID_"));
+			thingTypeIDs.putAll(getConstants(inputFile.toFile(),
+					"//thing-type/@id",
+					"THING_TYPE_ID_"));
+			bridgeTypeIDs.putAll(getConstants(inputFile.toFile(),
+					"//bridge-type/@id",
+					"BRIDGE_TYPE_ID_"));
+			channelGroupTypeIDs.putAll(getConstants(inputFile.toFile(),
+					"//channel-group-type/@id",
+					"CHANNEL_GROUP_TYPE_ID_"));
+			channelTypeIDs.putAll(getConstants(inputFile.toFile(),
+					"//channel-type/@id",
+					"CHANNEL_TYPE_ID_"));
 		}
 
+		if (bindingIDs.size() > 1) {
+			throw new MojoFailureException("Found more than one binding ID. Please have a look at your XML files!");
+		}
+
+		if (!bindingIDs.isEmpty()) {
+			bindingId = bindingIDs.values().iterator().next();
+			uids.putAll(bridgeTypeIDs);
+			uids.putAll(thingTypeIDs);
+		}
+
+		// Add constants in specific order
+		constants.putAll(bridgeTypeIDs);
+		constants.putAll(thingTypeIDs);
+		constants.putAll(channelTypeIDs);
+		constants.putAll(channelGroupTypeIDs);
+
 		// Generate code from template
-		String classResult = createClassFromTemplate(constants);
+		String classResult = createClassFromTemplate(bindingId, constants, uids);
 
 		// Write output file
 		writeFile(Path.of(this.outputDirectory, this.className + ".java"), classResult);
@@ -176,17 +203,23 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	/**
 	 * Create the Java class based on the Freemarker template.
 	 *
+	 * @param bindingId the binding ID
 	 * @param constants the constants map to generate
+	 * @param uids      The map of UIDs to generate
 	 * @return the Java class content as string
 	 * @throws MojoExecutionException on error, execution fails
 	 */
-	private String createClassFromTemplate(Map<String, String> constants) throws MojoExecutionException {
+	private String createClassFromTemplate(String bindingId, Map<String, String> constants, Map<String, String> uids)
+			throws MojoExecutionException
+	{
 		try {
 			// Template input
 			Map root = new HashMap();
 			root.put("package", this.packageName);
 			root.put("class", this.className);
+			root.put("bindingId", bindingId);
 			root.put("constants", constants);
+			root.put("uids", uids);
 			// Grep template from classpath
 			Configuration cfg = new Configuration(DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
 			cfg.setClassForTemplateLoading(this.getClass(), "/");
