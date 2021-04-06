@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.kokuwa</groupId>
 		<artifactId>maven-parent</artifactId>
-		<version>0.2.4</version>
+		<version>0.2.5</version>
 	</parent>
 
 	<groupId>io.kokuwa.edge</groupId>
@@ -49,6 +49,8 @@
 
 	<properties>
 		<maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+		<!-- Completely skip checkstyle from parent POM for now, because import order rules are completely not comprehensible -->
+		<checkstyle.skip>true</checkstyle.skip>
 	</properties>
 
 	<dependencies>
