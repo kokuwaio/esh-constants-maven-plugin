@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,21 +70,25 @@ public class GenerateConstantsMojo extends AbstractMojo {
 
 		// Get input file list
 		final Set<Path> inputFiles = findXMLFiles();
-		final Map<String, String> constants = new TreeMap<>();
-		final Map<String, String> uids = new TreeMap<>();
+		final Map<String, String> constants = new LinkedHashMap<>();
+		final Map<String, String> uids = new LinkedHashMap<>();
 
 		String bindingId = StringUtils.EMPTY;
-		Map<String, String> bindingIDs = new HashMap<>();
-		Map<String, String> thingTypeIDs = new HashMap<>();
-		Map<String, String> bridgeTypeIDs = new HashMap<>();
-		Map<String, String> channelGroupTypeIDs = new HashMap<>();
-		Map<String, String> channelTypeIDs = new HashMap<>();
+		Map<String, String> bindingIDs = new LinkedHashMap<>();
+		Map<String, String> properties = new LinkedHashMap<>();
+		Map<String, String> thingTypeIDs = new LinkedHashMap<>();
+		Map<String, String> bridgeTypeIDs = new LinkedHashMap<>();
+		Map<String, String> channelGroupTypeIDs = new LinkedHashMap<>();
+		Map<String, String> channelTypeIDs = new LinkedHashMap<>();
 
 		// Grep constants
 		for (Path inputFile : inputFiles) {
 			bindingIDs.putAll(getConstants(inputFile.toFile(),
 					"//thing-descriptions/@bindingId",
 					"BINDING_ID_"));
+			properties.putAll(getConstants(inputFile.toFile(),
+					"//property//text()",
+					"PROPERTY_"));
 			thingTypeIDs.putAll(getConstants(inputFile.toFile(),
 					"//thing-type/@id",
 					"THING_TYPE_ID_"));
@@ -111,6 +114,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		}
 
 		// Add constants in specific order
+		constants.putAll(properties);
 		constants.putAll(bridgeTypeIDs);
 		constants.putAll(thingTypeIDs);
 		constants.putAll(channelTypeIDs);
@@ -178,7 +182,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 			final XPathFactory xPathFactory = XPathFactory.newInstance();
 			final XPath xpath = xPathFactory.newXPath();
 
-			final Map<String, String> result = new HashMap<>();
+			final Map<String, String> result = new LinkedHashMap<>();
 
 			// Find node list in document matching the xpath expression
 			XPathExpression xPathExpression = xpath.compile(expression);
@@ -214,7 +218,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	{
 		try {
 			// Template input
-			Map root = new HashMap();
+			Map root = new LinkedHashMap();
 			root.put("package", this.packageName);
 			root.put("class", this.className);
 			root.put("bindingId", bindingId);

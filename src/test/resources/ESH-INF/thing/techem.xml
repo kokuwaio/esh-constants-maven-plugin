@@ -12,6 +12,14 @@
         <label>Techem HKV variant 45</label>
         <description>A heat cost allocator of Techem</description>
 
+        <properties>
+            <property name="vendor">Techem</property>
+            <property name="modelId">HKV45</property>
+            <property name="serial"></property>
+        </properties>
+
+        <representation-property>serial</representation-property>
+
         <channels>
             <channel id="current_reading" typeId="current_reading" />
             <channel id="last_reading" typeId="last_reading" />
