@@ -218,7 +218,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	{
 		try {
 			// Template input
-			Map root = new LinkedHashMap();
+			Map<String, Object> root = new LinkedHashMap<>();
 			root.put("package", this.packageName);
 			root.put("class", this.className);
 			root.put("bindingId", bindingId);
