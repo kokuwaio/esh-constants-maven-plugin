@@ -15,8 +15,9 @@ public final class Constants {
 	public static final String BINDING_ID = "wmbus";
 
 	// Constants
-	public static final String PROPERTY_TECHEM = "Techem";
-	public static final String PROPERTY_HKV45 = "HKV45";
+	public static final String PROPERTY_VENDOR = "vendor";
+	public static final String PROPERTY_MODELID = "modelId";
+	public static final String PROPERTY_SERIAL = "serial";
 	public static final String BRIDGE_TYPE_ID_WMBUSBRIDGE = "wmbusbridge";
 	public static final String BRIDGE_TYPE_ID_WMBUSVIRTUALBRIDGE = "wmbusvirtualbridge";
 	public static final String THING_TYPE_ID_ITRON_SMOKE_DETECTOR = "itron_smoke_detector";

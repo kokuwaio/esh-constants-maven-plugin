@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,61 +72,40 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		// Get input file list
 		final Set<Path> inputFiles = findXMLFiles();
 		final Map<String, String> constants = new LinkedHashMap<>();
-		final Map<String, String> uids = new LinkedHashMap<>();
 
 		String bindingId = StringUtils.EMPTY;
-		Map<String, String> bindingIDs = new LinkedHashMap<>();
-		Map<String, String> properties = new LinkedHashMap<>();
-		Map<String, String> thingTypeIDs = new LinkedHashMap<>();
-		Map<String, String> bridgeTypeIDs = new LinkedHashMap<>();
-		Map<String, String> channelGroupTypeIDs = new LinkedHashMap<>();
-		Map<String, String> channelTypeIDs = new LinkedHashMap<>();
+		Set<String> bindingIDs = scanDocuments(inputFiles, "//thing-descriptions/@bindingId");
+		Set<String> properties = scanDocuments(inputFiles, "//property/@name");
+		Set<String> thingTypeIDs = scanDocuments(inputFiles, "//thing-type/@id");
+		Set<String> bridgeTypeIDs = scanDocuments(inputFiles, "//bridge-type/@id");
+		Set<String> channelIDs = scanDocuments(inputFiles, "//channel/@id");
+		Set<String> channelTypeIDs = scanDocuments(inputFiles, "//channel-type/@id");
+		Set<String> channelGroupTypeIDs = scanDocuments(inputFiles, "//channel-group-type/@id");
 
-		// Grep constants
-		for (Path inputFile : inputFiles) {
-			bindingIDs.putAll(getConstants(inputFile.toFile(),
-					"//thing-descriptions/@bindingId",
-					"BINDING_ID_"));
-			properties.putAll(getConstants(inputFile.toFile(),
-					"//property//text()",
-					"PROPERTY_"));
-			thingTypeIDs.putAll(getConstants(inputFile.toFile(),
-					"//thing-type/@id",
-					"THING_TYPE_ID_"));
-			bridgeTypeIDs.putAll(getConstants(inputFile.toFile(),
-					"//bridge-type/@id",
-					"BRIDGE_TYPE_ID_"));
-			channelGroupTypeIDs.putAll(getConstants(inputFile.toFile(),
-					"//channel-group-type/@id",
-					"CHANNEL_GROUP_TYPE_ID_"));
-			channelTypeIDs.putAll(getConstants(inputFile.toFile(),
-					"//channel-type/@id",
-					"CHANNEL_TYPE_ID_"));
+		Map<String, Set<String>> channelUIDs = new LinkedHashMap<>();
+		for(String thingTypeID : thingTypeIDs) {
+			channelUIDs.put(thingTypeID, scanDocuments(inputFiles, "//thing-type[@id = '" + thingTypeID + "']/channels/channel/@id"));
 		}
 
-		if (bindingIDs.size() > 1) {
-			throw new MojoFailureException("Found more than one binding ID. Please have a look at your XML files!");
+
+		if (bindingIDs.size() != 1) {
+			throw new MojoFailureException("Expected exactly one binding ID. Please have a look at your XML files!");
 		}
 
-		if (!bindingIDs.isEmpty()) {
-			bindingId = bindingIDs.values().iterator().next();
-			uids.putAll(bridgeTypeIDs);
-			uids.putAll(thingTypeIDs);
-		}
+		bindingId = bindingIDs.iterator().next();
 
-		// Add constants in specific order
-		constants.putAll(properties);
-		constants.putAll(bridgeTypeIDs);
-		constants.putAll(thingTypeIDs);
-		constants.putAll(channelTypeIDs);
-		constants.putAll(channelGroupTypeIDs);
+		constants.putAll(toConstants(properties, "PROPERTY_"));
+		constants.putAll(toConstants(thingTypeIDs, "THING_TYPE_ID_"));
+		constants.putAll(toConstants(bridgeTypeIDs, "BRIDGE_TYPE_ID_"));
+		constants.putAll(toConstants(channelIDs, "CHANNEL_ID_"));
+		constants.putAll(toConstants(channelTypeIDs, "CHANNEL_TYPE_ID_"));
+		constants.putAll(toConstants(channelGroupTypeIDs, "CHANNEL_GROUP_TYPE_ID_"));
 
 		// Generate code from template
-		String classResult = createClassFromTemplate(bindingId, constants, uids);
+		String classResult = createClassFromTemplate(bindingId, constants, bridgeTypeIDs, thingTypeIDs, channelUIDs);
 
 		// Write output file
 		writeFile(Path.of(this.outputDirectory, this.className + ".java"), classResult);
-
 	}
 
 	/**
@@ -162,15 +142,30 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	}
 
 	/**
-	 * Retrieve constant strings from the given XML file.
+	 * Retrieve strings matching the XPath from the given XML files.
 	 *
-	 * @param file       the input file
-	 * @param expression the XPath expression to the constant
-	 * @param prefix     the constants prefix
-	 * @return A {@link Map} of constant name and constant value
+	 * @param inputFiles input file list
+	 * @param expression the XPath expression to scan
+	 * @return A {@link Set} of strings matching the XPath
 	 * @throws MojoExecutionException on error, execution fails
 	 */
-	private Map<String, String> getConstants(File file, String expression, String prefix)
+	private Set<String> scanDocuments(Set<Path> inputFiles, String expression) throws MojoExecutionException {
+		final Set<String> result = new LinkedHashSet<>();
+		for (Path inputFile : inputFiles) {
+			result.addAll(scanDocument(inputFile.toFile(), expression));
+		}
+		return result;
+	}
+
+	/**
+	 * Retrieve strings matching the XPath from the given XML file.
+	 *
+	 * @param file       the input file
+	 * @param expression the XPath expression to scan
+	 * @return A {@link Set} of strings matching the XPath
+	 * @throws MojoExecutionException on error, execution fails
+	 */
+	private Set<String> scanDocument(File file, String expression)
 			throws MojoExecutionException
 	{
 
@@ -182,7 +177,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 			final XPathFactory xPathFactory = XPathFactory.newInstance();
 			final XPath xpath = xPathFactory.newXPath();
 
-			final Map<String, String> result = new LinkedHashMap<>();
+			final Set<String> result = new LinkedHashSet<>();
 
 			// Find node list in document matching the xpath expression
 			XPathExpression xPathExpression = xpath.compile(expression);
@@ -190,7 +185,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
 				// Put the text content of the node to the map
-				result.put(prefix + node.getTextContent().toUpperCase(), node.getTextContent());
+				result.add(node.getTextContent());
 			}
 			return result;
 		} catch (ParserConfigurationException e) {
@@ -204,16 +199,27 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		}
 	}
 
+	private Map<String, String> toConstants(Set<String> values, String prefix) {
+		Map<String, String> result = new LinkedHashMap<>();
+		for (String value : values) {
+			result.put(prefix + value.toUpperCase(), value);
+		}
+		return result;
+	}
+
 	/**
 	 * Create the Java class based on the Freemarker template.
 	 *
-	 * @param bindingId the binding ID
-	 * @param constants the constants map to generate
-	 * @param uids      The map of UIDs to generate
+	 * @param bindingId     the binding ID
+	 * @param constants     the constants map to generate
+	 * @param bridgeTypeIDs the map of bridgeType IDs to generate
+	 * @param thingTypeIDs  the map of thingType IDs to generate
+	 * @param channelUIDs    the map of channel IDs to generate
 	 * @return the Java class content as string
 	 * @throws MojoExecutionException on error, execution fails
 	 */
-	private String createClassFromTemplate(String bindingId, Map<String, String> constants, Map<String, String> uids)
+	private String createClassFromTemplate(String bindingId, Map<String, String> constants,
+			Set<String> bridgeTypeIDs, Set<String> thingTypeIDs, Map<String, Set<String>> channelUIDs)
 			throws MojoExecutionException
 	{
 		try {
@@ -223,7 +229,9 @@ public class GenerateConstantsMojo extends AbstractMojo {
 			root.put("class", this.className);
 			root.put("bindingId", bindingId);
 			root.put("constants", constants);
-			root.put("uids", uids);
+			root.put("bridgeTypeIDs", bridgeTypeIDs);
+			root.put("thingTypeIDs", thingTypeIDs);
+			root.put("channelIDs", channelUIDs);
 			// Grep template from classpath
 			Configuration cfg = new Configuration(DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
 			cfg.setClassForTemplateLoading(this.getClass(), "/");
