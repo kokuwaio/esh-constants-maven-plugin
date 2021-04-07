@@ -18,13 +18,8 @@ import freemarker.template.TemplateException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.*;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -73,7 +68,6 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		final Set<Path> inputFiles = findXMLFiles();
 		final Map<String, String> constants = new LinkedHashMap<>();
 
-		String bindingId = StringUtils.EMPTY;
 		Set<String> bindingIDs = scanDocuments(inputFiles, "//thing-descriptions/@bindingId");
 		Set<String> properties = scanDocuments(inputFiles, "//property/@name");
 		Set<String> thingTypeIDs = scanDocuments(inputFiles, "//thing-type/@id");
@@ -83,16 +77,16 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		Set<String> channelGroupTypeIDs = scanDocuments(inputFiles, "//channel-group-type/@id");
 
 		Map<String, Set<String>> channelUIDs = new LinkedHashMap<>();
-		for(String thingTypeID : thingTypeIDs) {
-			channelUIDs.put(thingTypeID, scanDocuments(inputFiles, "//thing-type[@id = '" + thingTypeID + "']/channels/channel/@id"));
+		for (String thingTypeID : thingTypeIDs) {
+			channelUIDs.put(thingTypeID,
+					scanDocuments(inputFiles, "//thing-type[@id = '" + thingTypeID + "']/channels/channel/@id"));
 		}
-
 
 		if (bindingIDs.size() != 1) {
 			throw new MojoFailureException("Expected exactly one binding ID. Please have a look at your XML files!");
 		}
 
-		bindingId = bindingIDs.iterator().next();
+		String bindingId = bindingIDs.iterator().next();
 
 		constants.putAll(toConstants(properties, "PROPERTY_"));
 		constants.putAll(toConstants(thingTypeIDs, "THING_TYPE_ID_"));
@@ -160,7 +154,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	/**
 	 * Retrieve strings matching the XPath from the given XML file.
 	 *
-	 * @param file       the input file
+	 * @param file the input file
 	 * @param expression the XPath expression to scan
 	 * @return A {@link Set} of strings matching the XPath
 	 * @throws MojoExecutionException on error, execution fails
@@ -210,11 +204,11 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	/**
 	 * Create the Java class based on the Freemarker template.
 	 *
-	 * @param bindingId     the binding ID
-	 * @param constants     the constants map to generate
+	 * @param bindingId the binding ID
+	 * @param constants the constants map to generate
 	 * @param bridgeTypeIDs the map of bridgeType IDs to generate
-	 * @param thingTypeIDs  the map of thingType IDs to generate
-	 * @param channelUIDs    the map of channel IDs to generate
+	 * @param thingTypeIDs the map of thingType IDs to generate
+	 * @param channelUIDs the map of channel IDs to generate
 	 * @return the Java class content as string
 	 * @throws MojoExecutionException on error, execution fails
 	 */
@@ -250,7 +244,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	/**
 	 * Write file content to disk.
 	 *
-	 * @param path    the path to the file
+	 * @param path the path to the file
 	 * @param content the file content
 	 * @throws MojoExecutionException on error, execution fails
 	 */
