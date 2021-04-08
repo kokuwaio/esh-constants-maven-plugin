@@ -10,7 +10,7 @@
 
 	<groupId>io.kokuwa.edge</groupId>
 	<artifactId>esh-constants-maven-plugin</artifactId>
-	<version>0.1.7</version>
+	<version>0.1.8-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Eclipse Smarthome Constants generator Maven Plugin</name>

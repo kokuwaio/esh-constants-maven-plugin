@@ -22,7 +22,8 @@ collected and put together to a Java constant class.
 | Binding ID       | //thing-descriptions/@bindingId | BINDING_ID_            | The ID of the binding     |
 | Thing Type ID    | //thing-type/@id                | THING_TYPE_ID_         | The ID of a thing type    |
 | Bridge Type ID   | //bridge-type/@id               | BRIDGE_TYPE_ID_        | The ID of a bridge type   |
-| Channel Type ID  | //channel-type/@id              | CHANNEL_TYPE_ID_       | The ID of a channel       |
+| Channel ID       | //channel/@id                   | CHANNEL_ID_            | The ID of a channel       |
+| Channel Type ID  | //channel-type/@id              | CHANNEL_TYPE_ID_       | The ID of a channel type  |
 | Channel Group ID | //channel-group-type/@id        | CHANNEL_GROUP_TYPE_ID_ | The ID of a channel group |
 
 ## Usage
@@ -72,3 +73,9 @@ Example:
 ## Contribution
 
 Feel free to add every missing constant XPath as a pull request or kick off an issue on every trouble.
+
+## TODOs
+
+* Generate all UIDs
+* Generate channel group association
+* Generate XMLs / Constants (even parts of handler?) form OpenAPI file
