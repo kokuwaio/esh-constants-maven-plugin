@@ -75,6 +75,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		Set<String> channelIDs = scanDocuments(inputFiles, "//channel/@id");
 		Set<String> channelTypeIDs = scanDocuments(inputFiles, "//channel-type/@id");
 		Set<String> channelGroupTypeIDs = scanDocuments(inputFiles, "//channel-group-type/@id");
+		Set<String> channelGroupIDs = scanDocuments(inputFiles, "//channel-group/@id");
 
 		Map<String, Set<String>> channelUIDs = new LinkedHashMap<>();
 		for (String thingTypeID : thingTypeIDs) {
@@ -94,6 +95,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		constants.putAll(toConstants(channelIDs, "CHANNEL_ID_"));
 		constants.putAll(toConstants(channelTypeIDs, "CHANNEL_TYPE_ID_"));
 		constants.putAll(toConstants(channelGroupTypeIDs, "CHANNEL_GROUP_TYPE_ID_"));
+		constants.putAll(toConstants(channelGroupIDs, "GID_"));
 
 		// Generate code from template
 		String classResult = createClassFromTemplate(bindingId, constants, bridgeTypeIDs, thingTypeIDs, channelUIDs);
