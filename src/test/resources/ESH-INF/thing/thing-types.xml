@@ -72,6 +72,12 @@
         </config-description>
     </thing-type>
 
+    <!-- thing definition with a dash in its name -->
+    <thing-type id="ego-tcp">
+        <label>EGO</label>
+        <description>EGO</description>
+    </thing-type>
+
     <!-- channel definitions for all WMBus devices -->
     <channel-type id="room_temperature">
 		<item-type>Number</item-type>
