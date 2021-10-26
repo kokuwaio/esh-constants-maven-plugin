@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -96,7 +93,20 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		constants.putAll(toConstants(channelGroupTypeIDs, "CHANNEL_GROUP_TYPE_ID_"));
 
 		// Generate code from template
-		String classResult = createClassFromTemplate(bindingId, constants, bridgeTypeIDs, thingTypeIDs, channelUIDs);
+		String classResult = createClassFromTemplate(
+				bindingId,
+				constants,
+				bridgeTypeIDs
+						.stream()
+						.map(id->id.replaceAll("\\W", "_"))
+						// we must preserve the order, otherwise the unit test fails
+						.collect(LinkedHashSet::new, HashSet::add, AbstractCollection::addAll),
+				thingTypeIDs
+						.stream()
+						.map(id->id.replaceAll("\\W", "_"))
+						// we must preserve the order, otherwise the unit test fails
+						.collect(LinkedHashSet::new, HashSet::add, AbstractCollection::addAll),
+				channelUIDs);
 
 		// Write output file
 		writeFile(Path.of(this.outputDirectory, this.className + ".java"), classResult);
@@ -196,7 +206,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	private Map<String, String> toConstants(Set<String> values, String prefix) {
 		Map<String, String> result = new LinkedHashMap<>();
 		for (String value : values) {
-			result.put(prefix + value.toUpperCase(), value);
+			result.put(prefix + value.toUpperCase().replaceAll("\\W", "_"), value);
 		}
 		return result;
 	}
