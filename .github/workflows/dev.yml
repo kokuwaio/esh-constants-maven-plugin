@@ -1,0 +1,21 @@
+name: Dev
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - 'feature/**'
+      - 'bugfix/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: setup
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: build
+        run: mvn -B clean install -Dcheckstyle.skip
