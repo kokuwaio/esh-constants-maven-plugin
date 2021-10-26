@@ -33,7 +33,6 @@ public final class Constants {
 	public static final String THING_TYPE_ID_ENCRYPTED_METER = "encrypted_meter";
 	public static final String THING_TYPE_ID_THING_WITH_GROUPS = "thing_with_groups";
 	public static final String THING_TYPE_ID_EGO_TCP = "ego-tcp";
-
 	public static final String BRIDGE_TYPE_ID_WMBUSBRIDGE = "wmbusbridge";
 	public static final String BRIDGE_TYPE_ID_WMBUSVIRTUALBRIDGE = "wmbusvirtualbridge";
 	public static final String CID_LAST_FRAME = "last_frame";
