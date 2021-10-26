@@ -31,7 +31,9 @@ public final class Constants {
 	public static final String THING_TYPE_ID_TECHEM_WMZ43 = "techem_wmz43";
 	public static final String THING_TYPE_ID_METER = "meter";
 	public static final String THING_TYPE_ID_ENCRYPTED_METER = "encrypted_meter";
+	public static final String THING_TYPE_ID_THING_WITH_GROUPS = "thing_with_groups";
 	public static final String THING_TYPE_ID_EGO_TCP = "ego-tcp";
+
 	public static final String BRIDGE_TYPE_ID_WMBUSBRIDGE = "wmbusbridge";
 	public static final String BRIDGE_TYPE_ID_WMBUSVIRTUALBRIDGE = "wmbusvirtualbridge";
 	public static final String CHANNEL_ID_LAST_FRAME = "last_frame";
@@ -174,6 +176,10 @@ public final class Constants {
 	public static final String CHANNEL_TYPE_ID_CURRENT_DATE_SMOKE = "current_date_smoke";
 	public static final String CHANNEL_TYPE_ID_CURRENT_DATE_SMOKE_STRING = "current_date_smoke_string";
 	public static final String CHANNEL_TYPE_ID_CURRENT_DATE_SMOKE_NUMBER = "current_date_smoke_number";
+	public static final String CHANNEL_GROUP_TYPE_ID_GROUP_TYPE_1 = "group_type_1";
+	public static final String CHANNEL_GROUP_TYPE_ID_GROUP_TYPE_2 = "group_type_2";
+	public static final String GID_GROUP1 = "group1";
+	public static final String GID_GROUP2 = "group2";
 
 	// BridgeTypeUIDs
 	public static final ThingTypeUID WMBUSBRIDGE_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, BRIDGE_TYPE_ID_WMBUSBRIDGE);
@@ -192,6 +198,7 @@ public final class Constants {
 	public static final ThingTypeUID TECHEM_WMZ43_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, THING_TYPE_ID_TECHEM_WMZ43);
 	public static final ThingTypeUID METER_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, THING_TYPE_ID_METER);
 	public static final ThingTypeUID ENCRYPTED_METER_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, THING_TYPE_ID_ENCRYPTED_METER);
+	public static final ThingTypeUID THING_WITH_GROUPS_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, THING_TYPE_ID_THING_WITH_GROUPS);
 	public static final ThingTypeUID EGO_TCP_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, THING_TYPE_ID_EGO_TCP);
 
 	// ChannelUIDs for itron_smoke_detector
@@ -351,6 +358,8 @@ public final class Constants {
 	// ChannelUIDs for meter
 
 	// ChannelUIDs for encrypted_meter
+
+	// ChannelUIDs for thing_with_groups
 
 	// ChannelUIDs for ego-tcp
 

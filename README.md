@@ -17,14 +17,15 @@ The plugin scans for all XML files in the given input directory. It parses every
 extremely large files there) and looks for the nodes listed below. The text content of those matching nodes are
 collected and put together to a Java constant class.
 
-| Constant Type    | XPath                           | Constant Prefix        | Description               |
-|------------------|---------------------------------|------------------------|---------------------------|
-| Binding ID       | //thing-descriptions/@bindingId | BINDING_ID_            | The ID of the binding     |
-| Thing Type ID    | //thing-type/@id                | THING_TYPE_ID_         | The ID of a thing type    |
-| Bridge Type ID   | //bridge-type/@id               | BRIDGE_TYPE_ID_        | The ID of a bridge type   |
-| Channel ID       | //channel/@id                   | CHANNEL_ID_            | The ID of a channel       |
-| Channel Type ID  | //channel-type/@id              | CHANNEL_TYPE_ID_       | The ID of a channel type  |
-| Channel Group ID | //channel-group-type/@id        | CHANNEL_GROUP_TYPE_ID_ | The ID of a channel group |
+| Constant Type         | XPath                           | Constant Prefix        | Description                    |
+|-----------------------|---------------------------------|------------------------|--------------------------------|
+| Binding ID            | //thing-descriptions/@bindingId | BINDING_ID_            | The ID of the binding          |
+| Thing Type ID         | //thing-type/@id                | THING_TYPE_ID_         | The ID of a thing type         |
+| Bridge Type ID        | //bridge-type/@id               | BRIDGE_TYPE_ID_        | The ID of a bridge type        |
+| Channel ID            | //channel/@id                   | CHANNEL_ID_            | The ID of a channel            |
+| Channel Type ID       | //channel-type/@id              | CHANNEL_TYPE_ID_       | The ID of a channel type       |
+| Channel Group Type ID | //channel-group-type/@id        | CHANNEL_GROUP_TYPE_ID_ | The ID of a channel group type |
+| Channel Group ID      | //channel-group/@id             | GID_                   | The ID of a channel group      |
 
 ## Usage
 

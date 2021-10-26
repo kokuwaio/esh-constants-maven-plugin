@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <thing:thing-descriptions bindingId="wmbus" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
-	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+	xmlns:thing="https://openhab.org/schemas/config-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/config-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
     <!-- add new devices here -->
 
@@ -72,14 +72,47 @@
         </config-description>
     </thing-type>
 
+    <thing-type id="thing_with_groups">
+
+        <label>Thing with groups</label>
+        <description>Thing with groups.</description>
+
+        <channel-groups>
+            <channel-group id="group1" typeId="group_type_1"/>
+            <channel-group id="group2" typeId="group_type_2"/>
+        </channel-groups>
+    </thing-type>
+
+    <channel-group-type id="group_type_1">
+        <label>Group Type 1</label>
+        <channels>
+            <channel id="current_reading" typeId="current_reading" />
+            <channel id="last_reading" typeId="last_reading" />
+            <channel id="last_date" typeId="last_date" />
+            <channel id="last_date_string" typeId="last_date_string" />
+        </channels>
+    </channel-group-type>
+
+    <channel-group-type id="group_type_2">
+        <label>Group Type 2</label>
+        <channels>
+            <channel id="last_date_number" typeId="last_date_number" />
+            <channel id="current_date" typeId="current_date" />
+            <channel id="current_date_string" typeId="current_date_string" />
+            <channel id="current_date_number" typeId="current_date_number" />
+            <channel id="reception" typeId="reception" />
+        </channels>
+    </channel-group-type>
+
     <!-- thing definition with a dash in its name -->
     <thing-type id="ego-tcp">
         <label>EGO</label>
         <description>EGO</description>
     </thing-type>
 
-    <!-- channel definitions for all WMBus devices -->
-    <channel-type id="room_temperature">
+
+  <!-- channel definitions for all WMBus devices -->
+  <channel-type id="room_temperature">
 		<item-type>Number</item-type>
 		<label>Room Temperature</label>
 		<description>Current temperature in the room in degrees celsius.</description>
