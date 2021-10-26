@@ -33,7 +33,7 @@ public final class ${class} {
 
 	// ChannelUIDs for ${thingId}
 	<#list channelIDs[thingId] as channelId>
-	public static final ChannelUID ${thingId?upper_case}_${channelId?upper_case}_UID = new ChannelUID(${thingId?upper_case}_THING_TYPE_UID, CHANNEL_ID_${channelId?upper_case});
+	public static final ChannelUID ${thingId?upper_case}_${channelId?upper_case}_UID = new ChannelUID(${thingId?upper_case}_THING_TYPE_UID, CID_${channelId?upper_case});
 	</#list>
 </#list>
 

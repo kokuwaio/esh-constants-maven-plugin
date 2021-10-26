@@ -89,7 +89,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		constants.putAll(toConstants(properties, "PROPERTY_"));
 		constants.putAll(toConstants(thingTypeIDs, "THING_TYPE_ID_"));
 		constants.putAll(toConstants(bridgeTypeIDs, "BRIDGE_TYPE_ID_"));
-		constants.putAll(toConstants(channelIDs, "CHANNEL_ID_"));
+		constants.putAll(toConstants(channelIDs, "CID_"));
 		constants.putAll(toConstants(channelTypeIDs, "CHANNEL_TYPE_ID_"));
 		constants.putAll(toConstants(channelGroupTypeIDs, "CHANNEL_GROUP_TYPE_ID_"));
 		constants.putAll(toConstants(channelGroupIDs, "GID_"));
