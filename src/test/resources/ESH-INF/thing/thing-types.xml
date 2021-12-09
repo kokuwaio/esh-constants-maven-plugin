@@ -32,6 +32,17 @@
                 <unitLabel>minutes</unitLabel>
             </parameter>
         </config-description>
+
+        <!-- standard properties from org.eclipse.smarthome.core.thing.Thing, should be skipped -->
+        <properties>
+            <property name="vendor">N/A</property>
+            <property name="modelId">N/A</property>
+            <property name="serialNumber">N/A</property>
+            <property name="hardwareVersion">N/A</property>
+            <property name="firmwareVersion">N/A</property>
+            <property name="macAddress">N/A</property>
+        </properties>
+
     </thing-type>
 
     <!-- thing definition for encrypted, but still standard meter -->

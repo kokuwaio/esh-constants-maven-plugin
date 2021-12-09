@@ -40,6 +40,24 @@ import static freemarker.template.Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENT
 @Mojo(name = "generate-esh-constants", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GenerateConstantsMojo extends AbstractMojo {
 
+	/**
+	 * property names which are already defined in org.eclipse.smarthome.core.thing.Thing
+	 */
+	private static final Set<String> STANDARD_PROPERTIES = Set.of(
+		/* the key for the vendor property */
+		"vendor",
+		/* the key for the model ID property */
+		"modelId",
+		/* the key for the serial number property */
+		"serialNumber",
+		/* the key for the hardware version property */
+		"hardwareVersion",
+		/* the key for the firmware version property */
+		"firmwareVersion",
+		/* the key for the MAC address property */
+		"macAddress"
+	);
+
 	@Parameter(property = "esh-constants.inputDirectory",
 			defaultValue = "${project.basedir}/src/main/resources/ESH-INF")
 	private String inputDirectory;
@@ -66,7 +84,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		final Map<String, String> constants = new LinkedHashMap<>();
 
 		Set<String> bindingIDs = scanDocuments(inputFiles, "//thing-descriptions/@bindingId");
-		Set<String> properties = scanDocuments(inputFiles, "//property/@name");
+		Set<String> properties = exclude(STANDARD_PROPERTIES, scanDocuments(inputFiles, "//property/@name"));
 		Set<String> thingTypeIDs = scanDocuments(inputFiles, "//thing-type/@id");
 		Set<String> bridgeTypeIDs = scanDocuments(inputFiles, "//bridge-type/@id");
 		Set<String> channelIDs = scanDocuments(inputFiles, "//channel/@id");
@@ -266,5 +284,16 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoExecutionException("Unable to write file: " + path, e);
 		}
+	}
+
+	/**
+	 * @param exclude the set of values to exclude
+	 * @param candidates the origin value set
+	 * @return a copy of candidates with all values from exclude removed
+	 */
+	private static Set<String> exclude(Set<String> exclude, Set<String> candidates) {
+		return candidates.stream()
+			.filter(candidate -> !exclude.contains(candidate))
+			.collect(Collectors.toSet());
 	}
 }
