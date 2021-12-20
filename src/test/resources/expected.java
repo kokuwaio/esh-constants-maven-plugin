@@ -16,8 +16,6 @@ public final class Constants {
 	public static final String BINDING_ID = "wmbus";
 
 	// Constants
-	public static final String PROPERTY_VENDOR = "vendor";
-	public static final String PROPERTY_MODELID = "modelId";
 	public static final String PROPERTY_SERIAL = "serial";
 	public static final String THING_TYPE_ID_ITRON_SMOKE_DETECTOR = "itron_smoke_detector";
 	public static final String THING_TYPE_ID_TECHEM_HKV45 = "techem_hkv45";
