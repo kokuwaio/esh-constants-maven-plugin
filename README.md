@@ -4,11 +4,11 @@
 
 ## What?
 
-This plugin generates a Java constants class with all namings defined in the `ESH_INF` folder files.
+This plugin generates Java constants classes with all namings defined in the `ESH_INF` folder files.
 
 ## Why?
 
-Because it's hard to write this class on your own, if you have a lot of content. Also, the XML files should be
+Because it's hard to write this classes on your own, if you have a lot of content. Also, the XML files should be
 in the lead and your code base is in sync all the time.
 
 ## How?
@@ -22,10 +22,14 @@ collected and put together to a Java constant class.
 | Binding ID            | //thing-descriptions/@bindingId | BINDING_ID_            | The ID of the binding          |
 | Thing Type ID         | //thing-type/@id                | THING_TYPE_ID_         | The ID of a thing type         |
 | Bridge Type ID        | //bridge-type/@id               | BRIDGE_TYPE_ID_        | The ID of a bridge type        |
-| Channel ID            | //channel/@id                   | CHANNEL_ID_            | The ID of a channel            |
+| Channel ID            | //channel/@id                   | CID_                   | The ID of a channel            |
 | Channel Type ID       | //channel-type/@id              | CHANNEL_TYPE_ID_       | The ID of a channel type       |
 | Channel Group Type ID | //channel-group-type/@id        | CHANNEL_GROUP_TYPE_ID_ | The ID of a channel group type |
 | Channel Group ID      | //channel-group/@id             | GID_                   | The ID of a channel group      |
+
+Next to a file containing all the constant string values, the plugin also generates another file containing
+`ThingTypeUID` and `ChannelUID` constants. The latter are separated from the strings to allow importing the strings
+into non-ESH environments.
 
 ## Usage
 
@@ -37,12 +41,13 @@ Plugin Goals:
 
 Plugin Configuration:
 
-| Configuration   | Default Value              | Description       |
-|-----------------|----------------------------|-------------------|
-| packageName     | -                          | Java package name |
-| className       | -                          | Java class name   |
-| inputDirectory  | src/main/resources/ESH-INF | Input directory   |
-| outputDirectory | target/generated-sources   | Output directory  |
+| Configuration    | Default Value              | Description                                            |
+|------------------|----------------------------|--------------------------------------------------------|
+| packageName      | -                          | Java package name                                      |
+| stringsClassName | -                          | Name of the Java class containing all string constants |
+| openhabClassName | -                          | Name of the Java class containing all UID constants    |
+| inputDirectory   | src/main/resources/ESH-INF | Input directory                                        |
+| outputDirectory  | target/generated-sources   | Output directory                                       |
 
 Example:
 
@@ -61,7 +66,8 @@ Example:
 				<phase>generate-sources</phase>
 				<configuration>
 					<packageName>io.kokuwa.examples</packageName>
-					<className>Constants</className>
+					<stringsClassName>StringConstants</stringsClassName>
+					<openhabClassName>OHConstants</openhabClassName>
 					<inputDirectory>${project.basedir}/src/main/resources/ESH-INF</inputDirectory>
 					<outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
 				</configuration>

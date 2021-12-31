@@ -1,21 +1,6 @@
 package io.kokuwa.edge.esh.constants.maven.plugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import com.squareup.javapoet.*;
 import lombok.Setter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -28,7 +13,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import static freemarker.template.Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static javax.lang.model.element.Modifier.*;
 
 /**
  * Mojo for generating constant class from "ESH-INF" folder. The plugin scans for XML files in the input folder and
@@ -44,19 +41,23 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	 * property names which are already defined in org.eclipse.smarthome.core.thing.Thing
 	 */
 	private static final Set<String> STANDARD_PROPERTIES = Set.of(
-		/* the key for the vendor property */
-		"vendor",
-		/* the key for the model ID property */
-		"modelId",
-		/* the key for the serial number property */
-		"serialNumber",
-		/* the key for the hardware version property */
-		"hardwareVersion",
-		/* the key for the firmware version property */
-		"firmwareVersion",
-		/* the key for the MAC address property */
-		"macAddress"
+			/* the key for the vendor property */
+			"vendor",
+			/* the key for the model ID property */
+			"modelId",
+			/* the key for the serial number property */
+			"serialNumber",
+			/* the key for the hardware version property */
+			"hardwareVersion",
+			/* the key for the firmware version property */
+			"firmwareVersion",
+			/* the key for the MAC address property */
+			"macAddress"
 	);
+	public static final ClassName CHANNEL_UID_CLASS_NAME =
+			ClassName.get("org.eclipse.smarthome.core.thing", "ChannelUID");
+	public static final ClassName THING_TYPE_UID_CLASS_NAME =
+			ClassName.get("org.eclipse.smarthome.core.thing", "ThingTypeUID");
 
 	@Parameter(property = "esh-constants.inputDirectory",
 			defaultValue = "${project.basedir}/src/main/resources/ESH-INF")
@@ -70,8 +71,11 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	@Parameter(property = "esh-constants.packageName", required = true)
 	private String packageName;
 
-	@Parameter(property = "esh-constants.className", required = true)
-	private String className;
+	@Parameter(property = "esh-constants.openhabClassName", required = true)
+	private String openhabClassName;
+
+	@Parameter(property = "esh-constants.stringsClassName", required = true)
+	private String stringsClassName;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -81,16 +85,17 @@ public class GenerateConstantsMojo extends AbstractMojo {
 
 		// Get input file list
 		final Set<Path> inputFiles = findXMLFiles();
-		final Map<String, String> constants = new LinkedHashMap<>();
 
 		Set<String> bindingIDs = scanDocuments(inputFiles, "//thing-descriptions/@bindingId");
-		Set<String> properties = exclude(STANDARD_PROPERTIES, scanDocuments(inputFiles, "//property/@name"));
+		Set<String> properties = scanDocuments(inputFiles, "//property/@name");
 		Set<String> thingTypeIDs = scanDocuments(inputFiles, "//thing-type/@id");
 		Set<String> bridgeTypeIDs = scanDocuments(inputFiles, "//bridge-type/@id");
 		Set<String> channelIDs = scanDocuments(inputFiles, "//channel/@id");
 		Set<String> channelTypeIDs = scanDocuments(inputFiles, "//channel-type/@id");
 		Set<String> channelGroupTypeIDs = scanDocuments(inputFiles, "//channel-group-type/@id");
 		Set<String> channelGroupIDs = scanDocuments(inputFiles, "//channel-group/@id");
+
+		properties.removeAll(STANDARD_PROPERTIES);
 
 		Map<String, Set<String>> channelUIDs = new LinkedHashMap<>();
 		for (String thingTypeID : thingTypeIDs) {
@@ -104,32 +109,53 @@ public class GenerateConstantsMojo extends AbstractMojo {
 
 		String bindingId = bindingIDs.iterator().next();
 
-		constants.putAll(toConstants(properties, "PROPERTY_"));
-		constants.putAll(toConstants(thingTypeIDs, "THING_TYPE_ID_"));
-		constants.putAll(toConstants(bridgeTypeIDs, "BRIDGE_TYPE_ID_"));
-		constants.putAll(toConstants(channelIDs, "CID_"));
-		constants.putAll(toConstants(channelTypeIDs, "CHANNEL_TYPE_ID_"));
-		constants.putAll(toConstants(channelGroupTypeIDs, "CHANNEL_GROUP_TYPE_ID_"));
-		constants.putAll(toConstants(channelGroupIDs, "GID_"));
+		TypeSpec stringConstantsClass = TypeSpec.classBuilder(stringsClassName)
+				.addModifiers(PUBLIC, FINAL)
+				.addMethod(MethodSpec.constructorBuilder().addModifiers(PRIVATE).build())
+				.addField(FieldSpec.builder(String.class, "BINDING_ID", PUBLIC, STATIC, FINAL).initializer("$S", bindingId).build())
+				.addFields(mapConstants(properties, "PROPERTY_"))
+				.addFields(mapConstants(thingTypeIDs, "THING_TYPE_ID_"))
+				.addFields(mapConstants(bridgeTypeIDs, "BRIDGE_TYPE_ID_"))
+				.addFields(mapConstants(channelIDs, "CID_"))
+				.addFields(mapConstants(channelTypeIDs, "CHANNEL_TYPE_ID_"))
+				.addFields(mapConstants(channelGroupTypeIDs, "CHANNEL_GROUP_TYPE_ID_"))
+				.addFields(mapConstants(channelGroupIDs, "GID_"))
+				.build();
 
-		// Generate code from template
-		String classResult = createClassFromTemplate(
-				bindingId,
-				constants,
-				bridgeTypeIDs
-						.stream()
-						.map(id->id.replaceAll("\\W", "_"))
-						// we must preserve the order, otherwise the unit test fails
-						.collect(LinkedHashSet::new, HashSet::add, AbstractCollection::addAll),
-				thingTypeIDs
-						.stream()
-						.map(id->id.replaceAll("\\W", "_"))
-						// we must preserve the order, otherwise the unit test fails
-						.collect(LinkedHashSet::new, HashSet::add, AbstractCollection::addAll),
-				channelUIDs);
+		try {
+			JavaFile.builder(packageName, stringConstantsClass)
+					.build()
+					.writeTo(Path.of(outputDirectory));
+		} catch (IOException exception) {
+			throw new MojoExecutionException("Can't write string constants output file to " + outputDirectory, exception);
+		}
 
-		// Write output file
-		writeFile(Path.of(this.outputDirectory, this.className + ".java"), classResult);
+		TypeSpec openhabConstantsClass = TypeSpec.classBuilder(openhabClassName)
+				.addModifiers(PUBLIC, FINAL)
+				.addMethod(MethodSpec.constructorBuilder().addModifiers(PRIVATE).build())
+				.addFields(bridgeTypeIDs.stream()
+						.map(bridgeTypeId -> thingTypeUidSpec(bridgeTypeId, "BRIDGE_TYPE_ID_"))
+						.collect(Collectors.toList()))
+				.addFields(thingTypeIDs.stream()
+						.map(thingTypeId -> thingTypeUidSpec(thingTypeId, "THING_TYPE_ID_"))
+						.collect(Collectors.toList()))
+				.addFields(channelUIDs.entrySet()
+						.stream()
+						.flatMap(channelPair -> channelPair
+								.getValue()
+								.stream()
+								.map(channel -> channelUidSpec(channelPair.getKey(), channel)))
+						.collect(Collectors.toList()))
+				.build();
+
+		try {
+			JavaFile.builder(packageName, openhabConstantsClass)
+					.addStaticImport(ClassName.get(packageName, stringConstantsClass.name), "*")
+					.build()
+					.writeTo(Path.of(outputDirectory));
+		} catch (IOException exception) {
+			throw new MojoExecutionException("Can't write openhab constants output file to " + outputDirectory, exception);
+		}
 	}
 
 	/**
@@ -184,14 +210,13 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	/**
 	 * Retrieve strings matching the XPath from the given XML file.
 	 *
-	 * @param file the input file
+	 * @param file       the input file
 	 * @param expression the XPath expression to scan
 	 * @return A {@link Set} of strings matching the XPath
 	 * @throws MojoExecutionException on error, execution fails
 	 */
 	private Set<String> scanDocument(File file, String expression)
-			throws MojoExecutionException
-	{
+			throws MojoExecutionException {
 
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -212,88 +237,56 @@ public class GenerateConstantsMojo extends AbstractMojo {
 				result.add(node.getTextContent());
 			}
 			return result;
-		} catch (ParserConfigurationException e) {
-			throw new MojoExecutionException("Unable to parse XML document: " + file, e);
-		} catch (IOException e) {
-			throw new MojoExecutionException("Unable to parse XML document: " + file, e);
-		} catch (SAXException e) {
-			throw new MojoExecutionException("Unable to parse XML document: " + file, e);
-		} catch (XPathExpressionException e) {
+		} catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
 			throw new MojoExecutionException("Unable to parse XML document: " + file, e);
 		}
 	}
 
-	private Map<String, String> toConstants(Set<String> values, String prefix) {
-		Map<String, String> result = new LinkedHashMap<>();
-		for (String value : values) {
-			result.put(prefix + value.toUpperCase().replaceAll("\\W", "_"), value);
-		}
-		return result;
+
+	private String safeUpper(String name) {
+		return name.replaceAll("\\W", "_").toUpperCase(Locale.ROOT);
 	}
 
-	/**
-	 * Create the Java class based on the Freemarker template.
-	 *
-	 * @param bindingId the binding ID
-	 * @param constants the constants map to generate
-	 * @param bridgeTypeIDs the map of bridgeType IDs to generate
-	 * @param thingTypeIDs the map of thingType IDs to generate
-	 * @param channelUIDs the map of channel IDs to generate
-	 * @return the Java class content as string
-	 * @throws MojoExecutionException on error, execution fails
-	 */
-	private String createClassFromTemplate(String bindingId, Map<String, String> constants,
-			Set<String> bridgeTypeIDs, Set<String> thingTypeIDs, Map<String, Set<String>> channelUIDs)
-			throws MojoExecutionException
-	{
-		try {
-			// Template input
-			Map<String, Object> root = new LinkedHashMap<>();
-			root.put("package", this.packageName);
-			root.put("class", this.className);
-			root.put("bindingId", bindingId);
-			root.put("constants", constants);
-			root.put("bridgeTypeIDs", bridgeTypeIDs);
-			root.put("thingTypeIDs", thingTypeIDs);
-			root.put("channelIDs", channelUIDs);
-			// Grep template from classpath
-			Configuration cfg = new Configuration(DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-			cfg.setClassForTemplateLoading(this.getClass(), "/");
-			Template template = cfg.getTemplate("constants.ftl");
-			// Process template
-			StringWriter sw = new StringWriter();
-			template.process(root, sw);
-			return sw.toString();
-		} catch (TemplateException e) {
-			throw new MojoExecutionException("Unable to generate code from template.", e);
-		} catch (IOException e) {
-			throw new MojoExecutionException("Unable to generate code from template.", e);
-		}
+	private FieldSpec stringConstant(String prefix, String name) {
+		return FieldSpec.builder(
+						String.class,
+						prefix + safeUpper(name),
+						PUBLIC, STATIC, FINAL)
+				.initializer("$S", name)
+				.build();
 	}
 
-	/**
-	 * Write file content to disk.
-	 *
-	 * @param path the path to the file
-	 * @param content the file content
-	 * @throws MojoExecutionException on error, execution fails
-	 */
-	private void writeFile(Path path, String content) throws MojoExecutionException {
-		try {
-			Files.write(path, content.getBytes());
-		} catch (IOException e) {
-			throw new MojoExecutionException("Unable to write file: " + path, e);
-		}
+	private Iterable<FieldSpec> mapConstants(Collection<String> input, String prefix) {
+		return input.stream().map(p -> stringConstant(prefix, p)).collect(Collectors.toList());
 	}
 
-	/**
-	 * @param exclude the set of values to exclude
-	 * @param candidates the origin value set
-	 * @return a copy of candidates with all values from exclude removed
-	 */
-	private static Set<String> exclude(Set<String> exclude, Set<String> candidates) {
-		return candidates.stream()
-			.filter(candidate -> !exclude.contains(candidate))
-			.collect(Collectors.toSet());
+	private FieldSpec thingTypeUidSpec(String id, String prefix) {
+		String safeId = safeUpper(id);
+		return FieldSpec.builder(
+						THING_TYPE_UID_CLASS_NAME,
+						safeId + "_THING_TYPE_UID",
+						PUBLIC, STATIC, FINAL)
+				.initializer(
+						"new $T(BINDING_ID, $L$L)",
+						THING_TYPE_UID_CLASS_NAME,
+						prefix,
+						safeId)
+				.build();
 	}
+
+	private FieldSpec channelUidSpec(String thingId, String channelId) {
+		String safeThingId = safeUpper(thingId);
+		String safeChannelId = safeUpper(channelId);
+		return FieldSpec.builder(
+						CHANNEL_UID_CLASS_NAME,
+						safeThingId + "_" + safeChannelId + "_UID",
+						PUBLIC, STATIC, FINAL)
+				.initializer(
+						"new $T($L_THING_TYPE_UID, CID_$L)",
+						CHANNEL_UID_CLASS_NAME,
+						safeThingId,
+						safeChannelId)
+				.build();
+	}
+
 }
