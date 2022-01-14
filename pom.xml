@@ -55,11 +55,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>2.3.31</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 			<version>3.6.2</version>
@@ -79,6 +74,11 @@
 			<groupId>org.sonatype.plexus</groupId>
 			<artifactId>plexus-sec-dispatcher</artifactId>
 			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup</groupId>
+			<artifactId>javapoet</artifactId>
+			<version>1.13.0</version>
 		</dependency>
 		<!-- Commons -->
 		<dependency>
@@ -110,6 +110,12 @@
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
 			<version>4.0.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.testing.compile</groupId>
+			<artifactId>compile-testing</artifactId>
+			<version>0.19</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
