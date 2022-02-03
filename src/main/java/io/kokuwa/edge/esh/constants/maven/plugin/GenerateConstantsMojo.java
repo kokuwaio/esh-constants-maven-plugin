@@ -97,12 +97,6 @@ public class GenerateConstantsMojo extends AbstractMojo {
 
 		properties.removeAll(STANDARD_PROPERTIES);
 
-		Map<String, Set<String>> channelUIDs = new LinkedHashMap<>();
-		for (String thingTypeID : thingTypeIDs) {
-			channelUIDs.put(thingTypeID,
-					scanDocuments(inputFiles, "//thing-type[@id = '" + thingTypeID + "']/channels/channel/@id"));
-		}
-
 		if (bindingIDs.size() != 1) {
 			throw new MojoFailureException("Expected exactly one binding ID. Please have a look at your XML files!");
 		}
@@ -138,13 +132,6 @@ public class GenerateConstantsMojo extends AbstractMojo {
 						.collect(Collectors.toList()))
 				.addFields(thingTypeIDs.stream()
 						.map(thingTypeId -> thingTypeUidSpec(thingTypeId, "THING_TYPE_ID_"))
-						.collect(Collectors.toList()))
-				.addFields(channelUIDs.entrySet()
-						.stream()
-						.flatMap(channelPair -> channelPair
-								.getValue()
-								.stream()
-								.map(channel -> channelUidSpec(channelPair.getKey(), channel)))
 						.collect(Collectors.toList()))
 				.build();
 
