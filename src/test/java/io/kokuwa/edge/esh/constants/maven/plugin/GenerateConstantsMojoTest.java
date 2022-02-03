@@ -4,7 +4,6 @@ import com.google.testing.compile.JavaFileObjectSubject;
 import com.google.testing.compile.JavaFileObjects;
 import io.kokuwa.edge.esh.constants.maven.plugin.junit.MojoExtension;
 import io.kokuwa.edge.esh.constants.maven.plugin.junit.MojoProperty;
-import io.kokuwa.edge.esh.constants.maven.plugin.junit.SystemPropertyExtension;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import static com.google.testing.compile.JavaFileObjects.forResource;
  *
  * @author Fabian Schlegel
  */
-@ExtendWith({SystemPropertyExtension.class, MojoExtension.class})
+@ExtendWith(MojoExtension.class)
 @MojoProperty(name = "packageName", value = "org.test")
 @MojoProperty(name = "stringsClassName", value = "StringConstants")
 @MojoProperty(name = "openhabClassName", value = "OpenHabConstants")

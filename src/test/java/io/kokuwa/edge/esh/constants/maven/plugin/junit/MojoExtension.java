@@ -14,7 +14,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReflectionUtils;
@@ -25,17 +24,10 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.mockito.internal.util.reflection.FieldSetter;
-import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
-import org.sonatype.plexus.components.cipher.PlexusCipherException;
-import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.spy;
 
-@SuppressWarnings("unchecked")
 public class MojoExtension implements ParameterResolver, BeforeAllCallback, BeforeEachCallback {
 
 	private PluginDescriptor plugin;
@@ -150,18 +142,10 @@ public class MojoExtension implements ParameterResolver, BeforeAllCallback, Befo
 	}
 
 	private Path getProjectBuildDirectory(ExtensionContext context) {
-		String suffix = "";
-		if (context.getRequiredTestMethod().isAnnotationPresent(ParameterizedTest.class)) {
-			String uniqueId = context.getUniqueId();
-			int start = 26 + uniqueId.indexOf("test-template-invocation:#");
-			int end = start + uniqueId.substring(start).indexOf("]");
-			suffix = "." + uniqueId.substring(start, end);
-		}
 		return Paths.get("target",
 				"surefire",
 				context.getRequiredTestClass().getSimpleName()
 						+ "."
-						+ context.getRequiredTestMethod().getName()
-						+ suffix);
+						+ context.getRequiredTestMethod().getName());
 	}
 }
