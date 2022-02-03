@@ -241,6 +241,7 @@
 						<tagNameFormat>@{project.version}</tagNameFormat>
 						<releaseProfiles>release</releaseProfiles>
 						<localCheckout>true</localCheckout>
+						<signTag>true</signTag>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -290,34 +291,61 @@
 
 	<profiles>
 		<profile>
-			<id>github</id>
-			<activation>
-				<property>
-					<name>GITHUB_RUN_NUMBER</name>
-				</property>
-			</activation>
-			<repositories>
-				<repository>
-					<id>central</id>
-					<name>Maven Central</name>
-					<releases>
-						<enabled>true</enabled>
-					</releases>
-					<url>https://repo1.maven.org/maven2/</url>
-				</repository>
-				<repository>
-					<id>github</id>
-					<name>GitHub Kokuwa.io Apache Maven Packages</name>
-					<url>https://maven.pkg.github.com/kokuwaio/esh-constants-maven-plugin</url>
-				</repository>
-			</repositories>
-			<distributionManagement>
-				<repository>
-					<id>github</id>
-					<name>GitHub Kokuwa.io Apache Maven Packages</name>
-					<url>https://maven.pkg.github.com/kokuwaio/esh-constants-maven-plugin</url>
-				</repository>
-			</distributionManagement>
+			<id>release</id>
+			<build>
+				<plugins>
+
+					<!-- add source/javadoc for downstream projects -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- sign documents before upload -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- autoclose sonatype nexus repo -->
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>sonatype-nexus</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>
