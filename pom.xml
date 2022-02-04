@@ -38,9 +38,9 @@
 	</prerequisites>
 
 	<scm>
-		<connection>scm:git:git://github.com/kokuwaio/esh-constants-maven-plugin.git</connection>
-		<developerConnection>scm:git:git@github.com:kokuwaio/esh-constants-maven-plugin.git</developerConnection>
-		<url>https://github.com/kokuwaio/esh-constants-maven-plugin/tree/master</url>
+		<url>https://github.com/kokuwaio/esh-constants-maven-plugin</url>
+		<connection>scm:git:https://github.com/kokuwaio/esh-constants-maven-plugin.git</connection>
+		<developerConnection>scm:git:https://github.com/kokuwaio/esh-constants-maven-plugin.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<issueManagement>
