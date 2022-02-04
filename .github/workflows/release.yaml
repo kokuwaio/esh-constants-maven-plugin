@@ -26,7 +26,7 @@ jobs:
           server-password: SERVER_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
-      - run: mvn -B -ntp dependency:go-offline -q
+      - run: mvn -B -ntp dependency:go-offline
       - run: mvn -B -ntp release:prepare
       - run: mvn -B -ntp release:perform
         env:
