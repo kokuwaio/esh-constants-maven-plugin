@@ -35,10 +35,10 @@ jobs:
           server-id: sonatype-nexus
           server-username: SERVER_USERNAME
           server-password: SERVER_PASSWORD
-      - run: mvn -B dependency:go-offline -q
-      - run: mvn -B verify
+      - run: mvn -B -ntp dependency:go-offline -q
+      - run: mvn -B -ntp verify
         if: github.ref != 'refs/heads/main'
-      - run: mvn -B deploy
+      - run: mvn -B -ntp deploy
         if: github.ref == 'refs/heads/main'
         env:
           SERVER_USERNAME: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
