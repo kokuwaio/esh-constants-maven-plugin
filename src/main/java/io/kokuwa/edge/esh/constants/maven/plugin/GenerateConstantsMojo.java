@@ -1,7 +1,6 @@
 package io.kokuwa.edge.esh.constants.maven.plugin;
 
 import com.squareup.javapoet.*;
-import lombok.Setter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -63,7 +62,6 @@ public class GenerateConstantsMojo extends AbstractMojo {
 			defaultValue = "${project.basedir}/src/main/resources/ESH-INF")
 	private String inputDirectory;
 
-	@Setter
 	@Parameter(property = "esh-constants.outputDirectory",
 			defaultValue = "${project.build.directory}/generated-sources/esh-constants")
 	private String outputDirectory;
@@ -229,16 +227,15 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		}
 	}
 
-
 	private String safeUpper(String name) {
 		return name.replaceAll("\\W", "_").toUpperCase(Locale.ROOT);
 	}
 
 	private FieldSpec stringConstant(String prefix, String name) {
 		return FieldSpec.builder(
-						String.class,
-						prefix + safeUpper(name),
-						PUBLIC, STATIC, FINAL)
+				String.class,
+				prefix + safeUpper(name),
+				PUBLIC, STATIC, FINAL)
 				.initializer("$S", name)
 				.build();
 	}
@@ -250,9 +247,9 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	private FieldSpec thingTypeUidSpec(String id, String prefix) {
 		String safeId = safeUpper(id);
 		return FieldSpec.builder(
-						THING_TYPE_UID_CLASS_NAME,
-						safeId + "_THING_TYPE_UID",
-						PUBLIC, STATIC, FINAL)
+				THING_TYPE_UID_CLASS_NAME,
+				safeId + "_THING_TYPE_UID",
+				PUBLIC, STATIC, FINAL)
 				.initializer(
 						"new $T(BINDING_ID, $L$L)",
 						THING_TYPE_UID_CLASS_NAME,
@@ -265,9 +262,9 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		String safeThingId = safeUpper(thingId);
 		String safeChannelId = safeUpper(channelId);
 		return FieldSpec.builder(
-						CHANNEL_UID_CLASS_NAME,
-						safeThingId + "_" + safeChannelId + "_UID",
-						PUBLIC, STATIC, FINAL)
+				CHANNEL_UID_CLASS_NAME,
+				safeThingId + "_" + safeChannelId + "_UID",
+				PUBLIC, STATIC, FINAL)
 				.initializer(
 						"new $T($L_THING_TYPE_UID, CID_$L)",
 						CHANNEL_UID_CLASS_NAME,
@@ -276,4 +273,25 @@ public class GenerateConstantsMojo extends AbstractMojo {
 				.build();
 	}
 
+	// setter
+
+	public void setInputDirectory(String inputDirectory) {
+		this.inputDirectory = inputDirectory;
+	}
+
+	public void setOutputDirectory(String outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	public void setOpenhabClassName(String openhabClassName) {
+		this.openhabClassName = openhabClassName;
+	}
+
+	public void setStringsClassName(String stringsClassName) {
+		this.stringsClassName = stringsClassName;
+	}
 }

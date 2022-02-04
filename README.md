@@ -53,27 +53,27 @@ Example:
 
 ```xml
 <plugins>
-	<plugin>
-		<groupId>io.kokuwa.edge</groupId>
-		<artifactId>esh-constants-maven-plugin</artifactId>
-		<version>RELEASE</version>
-		<executions>
-			<execution>
-				<id>generate-esh-constants</id>
-				<goals>
-					<goal>generate-esh-constants</goal>
-				</goals>
-				<phase>generate-sources</phase>
-				<configuration>
-					<packageName>io.kokuwa.examples</packageName>
-					<stringsClassName>StringConstants</stringsClassName>
-					<openhabClassName>OHConstants</openhabClassName>
-					<inputDirectory>${project.basedir}/src/main/resources/ESH-INF</inputDirectory>
-					<outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-				</configuration>
-			</execution>
-		</executions>
-	</plugin>
+ <plugin>
+  <groupId>io.kokuwa.edge</groupId>
+  <artifactId>esh-constants-maven-plugin</artifactId>
+  <version>RELEASE</version>
+  <executions>
+   <execution>
+    <id>generate-esh-constants</id>
+    <goals>
+     <goal>generate-esh-constants</goal>
+    </goals>
+    <phase>generate-sources</phase>
+    <configuration>
+     <packageName>io.kokuwa.examples</packageName>
+     <stringsClassName>StringConstants</stringsClassName>
+     <openhabClassName>OHConstants</openhabClassName>
+     <inputDirectory>${project.basedir}/src/main/resources/ESH-INF</inputDirectory>
+     <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+    </configuration>
+   </execution>
+  </executions>
+ </plugin>
 </plugins>
 ```
 
