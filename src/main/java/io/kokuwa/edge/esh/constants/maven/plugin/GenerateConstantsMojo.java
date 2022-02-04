@@ -258,21 +258,6 @@ public class GenerateConstantsMojo extends AbstractMojo {
 				.build();
 	}
 
-	private FieldSpec channelUidSpec(String thingId, String channelId) {
-		String safeThingId = safeUpper(thingId);
-		String safeChannelId = safeUpper(channelId);
-		return FieldSpec.builder(
-				CHANNEL_UID_CLASS_NAME,
-				safeThingId + "_" + safeChannelId + "_UID",
-				PUBLIC, STATIC, FINAL)
-				.initializer(
-						"new $T($L_THING_TYPE_UID, CID_$L)",
-						CHANNEL_UID_CLASS_NAME,
-						safeThingId,
-						safeChannelId)
-				.build();
-	}
-
 	// setter
 
 	public void setInputDirectory(String inputDirectory) {
