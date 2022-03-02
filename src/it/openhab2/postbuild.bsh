@@ -1,0 +1,34 @@
+import java.io.File;
+
+boolean equals(File expectedFile, File actualFile) {
+
+	if (!expectedFile.isFile()) {
+		System.out.println("File not found: " + expectedFile);
+		return false;
+	}
+	if (!actualFile.isFile()) {
+		System.out.println("File not found: " + actualFile);
+		return false;
+	}
+
+	var expectedPayload = com.google.testing.compile.JavaFileObjects.forResource(expectedFile.toURL());
+	var actualPayload = com.google.testing.compile.JavaFileObjects.forResource(actualFile.toURL());
+	try {
+		com.google.testing.compile.JavaFileObjectSubject.assertThat(expectedPayload).hasSourceEquivalentTo(actualPayload);
+		return true;
+	} catch (Exception e) {
+		e.printStackTrace();
+		System.out.println("Run `diff " + actualFile + " " + expectedFile + "`");
+		return false;
+	}
+}
+
+File stringExpected = new File(basedir + "/expected/TestString.java");
+File stringActual = new File(basedir + "/target/generated-sources/esh-constants/io/kokuwa/test/TestString.java");
+boolean stringEquals = equals(stringExpected, stringActual);
+
+File openhabExpected = new File(basedir + "/expected/TestOpenHab.java");
+File openhabActual = new File(basedir + "/target/generated-sources/esh-constants/io/kokuwa/test/TestOpenHab.java");
+boolean openhabEquals = equals(openhabExpected, openhabActual);
+
+return stringEquals && openhabEquals;
