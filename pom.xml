@@ -104,7 +104,7 @@
 		<version.org.apache.maven.api>3.8.4</version.org.apache.maven.api>
 		<version.org.apache.maven.annotations>3.6.4</version.org.apache.maven.annotations>
 		<version.org.junit.jupiter>5.8.2</version.org.junit.jupiter>
-		<version.org.mockito>4.3.1</version.org.mockito>
+		<version.org.mockito>4.4.0</version.org.mockito>
 		<version.com.google.testing.compile>0.19</version.com.google.testing.compile>
 		<version.com.squareup.javapoet>1.13.0</version.com.squareup.javapoet>
 
