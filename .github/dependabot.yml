@@ -3,8 +3,10 @@ updates:
   - package-ecosystem: maven
     directory: /
     schedule:
-      interval: daily
+      interval: monthly
+    ignore:
+      - dependency-name: org.apache.maven:maven-plugin-api
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: daily
+      interval: monthly
