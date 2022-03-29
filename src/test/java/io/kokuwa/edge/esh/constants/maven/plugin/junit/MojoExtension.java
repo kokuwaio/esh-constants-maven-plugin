@@ -5,11 +5,14 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.kokuwa.edge.esh.constants.maven.plugin.GenerateConstantsMojo;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -98,9 +101,10 @@ public class MojoExtension implements ParameterResolver, BeforeAllCallback, Befo
 
 			// read mojo values from annotations
 
-			MojoProperty[] mojoProperties = ArrayUtils.addAll(
-					context.getRequiredTestClass().getAnnotationsByType(MojoProperty.class),
-					context.getRequiredTestMethod().getAnnotationsByType(MojoProperty.class));
+			List<MojoProperty> mojoProperties = Stream
+					.concat(Arrays.stream(context.getRequiredTestClass().getAnnotationsByType(MojoProperty.class)),
+							Arrays.stream(context.getRequiredTestMethod().getAnnotationsByType(MojoProperty.class)))
+					.collect(Collectors.toList());
 			for (MojoProperty mojoProperty : mojoProperties) {
 				getField(mojoType, mojoProperty.name()).set(mojo, resolve(context, mojoProperty.value()));
 			}
