@@ -90,6 +90,7 @@
 		<version.org.apache.maven.plugins.deploy>3.0.0-M2</version.org.apache.maven.plugins.deploy>
 		<version.org.apache.maven.plugins.gpg>3.0.1</version.org.apache.maven.plugins.gpg>
 		<version.org.apache.maven.plugins.install>3.0.0-M1</version.org.apache.maven.plugins.install>
+		<version.org.apache.maven.plugins.invoker>3.2.2</version.org.apache.maven.plugins.invoker>
 		<version.org.apache.maven.plugins.javadoc>3.3.2</version.org.apache.maven.plugins.javadoc>
 		<version.org.apache.maven.plugins.jar>3.2.2</version.org.apache.maven.plugins.jar>
 		<version.org.apache.maven.plugins.plugin_>3.6.4</version.org.apache.maven.plugins.plugin_>
@@ -97,12 +98,14 @@
 		<version.org.apache.maven.plugins.resources>3.2.0</version.org.apache.maven.plugins.resources>
 		<version.org.apache.maven.plugins.source>3.2.1</version.org.apache.maven.plugins.source>
 		<version.org.apache.maven.plugins.surefire>3.0.0-M5</version.org.apache.maven.plugins.surefire>
+		<version.org.codehaus.mojo.build-helper>3.3.0</version.org.codehaus.mojo.build-helper>
 		<version.org.codehaus.mojo.tidy>1.1.0</version.org.codehaus.mojo.tidy>
 		<version.org.sonatype.plugins.nexus-staging>1.6.12</version.org.sonatype.plugins.nexus-staging>
 
 		<!-- dependencies -->
 
-		<version.org.apache.maven.plugin.tools>3.6.4</version.org.apache.maven.plugin.tools>
+		<version.org.apache.maven.api>3.8.5</version.org.apache.maven.api>
+		<version.org.apache.maven.annotations>3.6.4</version.org.apache.maven.annotations>
 		<version.org.junit.jupiter>5.8.2</version.org.junit.jupiter>
 		<version.org.mockito>4.4.0</version.org.mockito>
 		<version.com.google.testing.compile>0.19</version.com.google.testing.compile>
@@ -117,14 +120,12 @@
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-plugin-api</artifactId>
-				<version>${project.prerequisites.maven}</version>
-				<scope>provided</scope>
+				<version>${version.org.apache.maven.api}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven.plugin-tools</groupId>
 				<artifactId>maven-plugin-annotations</artifactId>
-				<version>${version.org.apache.maven.plugin.tools}</version>
-				<scope>provided</scope>
+				<version>${version.org.apache.maven.annotations}</version>
 			</dependency>
 
 			<!-- libraries -->
@@ -227,6 +228,11 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-invoker-plugin</artifactId>
+					<version>${version.org.apache.maven.plugins.invoker}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${version.org.apache.maven.plugins.javadoc}</version>
 				</plugin>
@@ -238,7 +244,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-plugin-plugin</artifactId>
-					<version>${version.org.apache.maven.plugin.tools}</version>
+					<version>${version.org.apache.maven.plugins.plugin_}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -268,6 +274,11 @@
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>${version.org.codehaus.mojo.build-helper}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>tidy-maven-plugin</artifactId>
 					<version>${version.org.codehaus.mojo.tidy}</version>
 				</plugin>
@@ -279,6 +290,27 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+
+			<!-- run invoker tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-invoker-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>install</goal>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+						<configuration>
+							<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+							<addTestClassPath>true</addTestClassPath>
+							<streamLogsOnFailures>true</streamLogsOnFailures>
+							<writeJunitReport>true</writeJunitReport>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<!-- fail if any pom is dirty -->
 			<plugin>

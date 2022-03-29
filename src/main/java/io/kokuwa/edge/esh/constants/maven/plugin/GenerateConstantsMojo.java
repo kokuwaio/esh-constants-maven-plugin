@@ -84,14 +84,14 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		// Get input file list
 		final Set<Path> inputFiles = findXMLFiles();
 
-		Set<String> bindingIDs = scanDocuments(inputFiles, "//thing-descriptions/@bindingId");
-		Set<String> properties = scanDocuments(inputFiles, "//property/@name");
-		Set<String> thingTypeIDs = scanDocuments(inputFiles, "//thing-type/@id");
-		Set<String> bridgeTypeIDs = scanDocuments(inputFiles, "//bridge-type/@id");
-		Set<String> channelIDs = scanDocuments(inputFiles, "//channel/@id");
-		Set<String> channelTypeIDs = scanDocuments(inputFiles, "//channel-type/@id");
-		Set<String> channelGroupTypeIDs = scanDocuments(inputFiles, "//channel-group-type/@id");
-		Set<String> channelGroupIDs = scanDocuments(inputFiles, "//channel-group/@id");
+		List<String> bindingIDs = scanDocuments(inputFiles, "//thing-descriptions/@bindingId");
+		List<String> properties = scanDocuments(inputFiles, "//property/@name");
+		List<String> thingTypeIDs = scanDocuments(inputFiles, "//thing-type/@id");
+		List<String> bridgeTypeIDs = scanDocuments(inputFiles, "//bridge-type/@id");
+		List<String> channelIDs = scanDocuments(inputFiles, "//channel/@id");
+		List<String> channelTypeIDs = scanDocuments(inputFiles, "//channel-type/@id");
+		List<String> channelGroupTypeIDs = scanDocuments(inputFiles, "//channel-group-type/@id");
+		List<String> channelGroupIDs = scanDocuments(inputFiles, "//channel-group/@id");
 
 		properties.removeAll(STANDARD_PROPERTIES);
 
@@ -184,12 +184,12 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	 * @return A {@link Set} of strings matching the XPath
 	 * @throws MojoExecutionException on error, execution fails
 	 */
-	private Set<String> scanDocuments(Set<Path> inputFiles, String expression) throws MojoExecutionException {
+	private List<String> scanDocuments(Set<Path> inputFiles, String expression) throws MojoExecutionException {
 		final Set<String> result = new LinkedHashSet<>();
 		for (Path inputFile : inputFiles) {
 			result.addAll(scanDocument(inputFile.toFile(), expression));
 		}
-		return result;
+		return result.stream().sorted().distinct().collect(Collectors.toList());
 	}
 
 	/**
