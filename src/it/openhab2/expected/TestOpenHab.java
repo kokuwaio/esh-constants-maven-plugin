@@ -1,10 +1,10 @@
-package org.test;
+package io.kokuwa.test;
 
-import static org.test.StringConstants.*;
+import static io.kokuwa.test.TestString.*;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
-public final class OpenHabConstants {
+public final class TestOpenHab {
   public static final ThingTypeUID WMBUSBRIDGE_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, BRIDGE_TYPE_ID_WMBUSBRIDGE);
 
   public static final ThingTypeUID WMBUSVIRTUALBRIDGE_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, BRIDGE_TYPE_ID_WMBUSVIRTUALBRIDGE);
@@ -37,6 +37,6 @@ public final class OpenHabConstants {
 
   public static final ThingTypeUID THING_WITH_GROUPS_THING_TYPE_UID = new ThingTypeUID(BINDING_ID, THING_TYPE_ID_THING_WITH_GROUPS);
 
-  private OpenHabConstants() {
+  private TestOpenHab() {
   }
 }

@@ -1,8 +1,8 @@
-package org.test;
+package io.kokuwa.test;
 
 import java.lang.String;
 
-public final class StringConstants {
+public final class TestString {
   public static final String BINDING_ID = "wmbus";
 
   public static final String PROPERTY_SERIAL = "serial";
@@ -327,6 +327,6 @@ public final class StringConstants {
 
   public static final String GID_GROUP2 = "group2";
 
-  private StringConstants() {
+  private TestString() {
   }
 }
