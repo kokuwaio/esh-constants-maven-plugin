@@ -58,20 +58,25 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	public static final ClassName THING_TYPE_UID_CLASS_NAME =
 			ClassName.get("org.eclipse.smarthome.core.thing", "ThingTypeUID");
 
+	/** Input directory. */
 	@Parameter(property = "esh-constants.inputDirectory",
 			defaultValue = "${project.basedir}/src/main/resources/ESH-INF")
 	private String inputDirectory;
 
+	/** Output directory for constant classes. */
 	@Parameter(property = "esh-constants.outputDirectory",
 			defaultValue = "${project.build.directory}/generated-sources/esh-constants")
 	private String outputDirectory;
 
+	/** Package name for constant classes. */
 	@Parameter(property = "esh-constants.packageName", required = true)
 	private String packageName;
 
+	/** Class name for openHAB constants. */
 	@Parameter(property = "esh-constants.openhabClassName", required = true)
 	private String openhabClassName;
 
+	/** Class name for string constants. */
 	@Parameter(property = "esh-constants.stringsClassName", required = true)
 	private String stringsClassName;
 
