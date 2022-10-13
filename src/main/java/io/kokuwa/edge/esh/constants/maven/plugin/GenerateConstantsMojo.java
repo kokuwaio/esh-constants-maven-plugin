@@ -1,6 +1,31 @@
 package io.kokuwa.edge.esh.constants.maven.plugin;
 
-import com.squareup.javapoet.*;
+import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.PUBLIC;
+import static javax.lang.model.element.Modifier.STATIC;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -12,19 +37,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static javax.lang.model.element.Modifier.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 
 /**
  * Mojo for generating constant class from "ESH-INF" folder. The plugin scans for XML files in the input folder and
@@ -51,12 +68,10 @@ public class GenerateConstantsMojo extends AbstractMojo {
 			/* the key for the firmware version property */
 			"firmwareVersion",
 			/* the key for the MAC address property */
-			"macAddress"
-	);
-	public static final ClassName CHANNEL_UID_CLASS_NAME =
-			ClassName.get("org.eclipse.smarthome.core.thing", "ChannelUID");
-	public static final ClassName THING_TYPE_UID_CLASS_NAME =
-			ClassName.get("org.eclipse.smarthome.core.thing", "ThingTypeUID");
+			"macAddress");
+
+	private static final String PACKAGE = "org.eclipse.smarthome.core.thing";
+	private static final ClassName THING_TYPE_UID_CLASS_NAME = ClassName.get(PACKAGE, "ThingTypeUID");
 
 	/** Input directory. */
 	@Parameter(property = "esh-constants.inputDirectory",
@@ -109,7 +124,10 @@ public class GenerateConstantsMojo extends AbstractMojo {
 		TypeSpec stringConstantsClass = TypeSpec.classBuilder(stringsClassName)
 				.addModifiers(PUBLIC, FINAL)
 				.addMethod(MethodSpec.constructorBuilder().addModifiers(PRIVATE).build())
-				.addField(FieldSpec.builder(String.class, "BINDING_ID", PUBLIC, STATIC, FINAL).initializer("$S", bindingId).build())
+				.addField(FieldSpec
+						.builder(String.class, "BINDING_ID", PUBLIC, STATIC, FINAL)
+						.initializer("$S", bindingId)
+						.build())
 				.addFields(mapConstants(properties, "PROPERTY_"))
 				.addFields(mapConstants(thingTypeIDs, "THING_TYPE_ID_"))
 				.addFields(mapConstants(bridgeTypeIDs, "BRIDGE_TYPE_ID_"))
@@ -123,8 +141,8 @@ public class GenerateConstantsMojo extends AbstractMojo {
 			JavaFile.builder(packageName, stringConstantsClass)
 					.build()
 					.writeTo(Path.of(outputDirectory));
-		} catch (IOException exception) {
-			throw new MojoExecutionException("Can't write string constants output file to " + outputDirectory, exception);
+		} catch (IOException e) {
+			throw new MojoExecutionException("Can't write string constants output file to " + outputDirectory, e);
 		}
 
 		TypeSpec openhabConstantsClass = TypeSpec.classBuilder(openhabClassName)
@@ -143,8 +161,8 @@ public class GenerateConstantsMojo extends AbstractMojo {
 					.addStaticImport(ClassName.get(packageName, stringConstantsClass.name), "*")
 					.build()
 					.writeTo(Path.of(outputDirectory));
-		} catch (IOException exception) {
-			throw new MojoExecutionException("Can't write openhab constants output file to " + outputDirectory, exception);
+		} catch (IOException e) {
+			throw new MojoExecutionException("Can't write openhab constants output file to " + outputDirectory, e);
 		}
 	}
 
@@ -168,15 +186,12 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	 * @throws MojoExecutionException on error, execution fails
 	 */
 	private Set<Path> findXMLFiles() throws MojoExecutionException {
-
 		Set<Path> result;
 		// Recursively walk down the directory tree and put all ".xml" files in the set
 		try (Stream<Path> walk = Files.walk(Path.of(inputDirectory))) {
 			result = walk.filter(p -> p.getFileName().toString().endsWith("xml")).collect(Collectors.toSet());
-
 		} catch (IOException e) {
 			throw new MojoExecutionException("Unable to get input files.", e);
-
 		}
 		return result;
 	}
@@ -205,8 +220,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	 * @return A {@link Set} of strings matching the XPath
 	 * @throws MojoExecutionException on error, execution fails
 	 */
-	private Set<String> scanDocument(File file, String expression)
-			throws MojoExecutionException {
+	private Set<String> scanDocument(File file, String expression) throws MojoExecutionException {
 
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -237,10 +251,8 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	}
 
 	private FieldSpec stringConstant(String prefix, String name) {
-		return FieldSpec.builder(
-				String.class,
-				prefix + safeUpper(name),
-				PUBLIC, STATIC, FINAL)
+		return FieldSpec
+				.builder(String.class, prefix + safeUpper(name), PUBLIC, STATIC, FINAL)
 				.initializer("$S", name)
 				.build();
 	}
@@ -251,15 +263,9 @@ public class GenerateConstantsMojo extends AbstractMojo {
 
 	private FieldSpec thingTypeUidSpec(String id, String prefix) {
 		String safeId = safeUpper(id);
-		return FieldSpec.builder(
-				THING_TYPE_UID_CLASS_NAME,
-				safeId + "_THING_TYPE_UID",
-				PUBLIC, STATIC, FINAL)
-				.initializer(
-						"new $T(BINDING_ID, $L$L)",
-						THING_TYPE_UID_CLASS_NAME,
-						prefix,
-						safeId)
+		return FieldSpec
+				.builder(THING_TYPE_UID_CLASS_NAME, safeId + "_THING_TYPE_UID", PUBLIC, STATIC, FINAL)
+				.initializer("new $T(BINDING_ID, $L$L)", THING_TYPE_UID_CLASS_NAME, prefix, safeId)
 				.build();
 	}
 
