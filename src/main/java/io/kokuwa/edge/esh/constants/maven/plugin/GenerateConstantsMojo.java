@@ -33,7 +33,7 @@ import static javax.lang.model.element.Modifier.*;
  *
  * @author Fabian Schlegel
  */
-@Mojo(name = "generate-esh-constants", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+@Mojo(name = "generate-esh-constants", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public class GenerateConstantsMojo extends AbstractMojo {
 
 	/**
