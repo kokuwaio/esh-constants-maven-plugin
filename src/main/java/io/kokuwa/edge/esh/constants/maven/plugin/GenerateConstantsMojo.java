@@ -49,6 +49,7 @@ import com.squareup.javapoet.TypeSpec;
  * using a Freemarker template.
  *
  * @author Fabian Schlegel
+ * @since 0.1.0
  */
 @Mojo(name = "generate-esh-constants", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public class GenerateConstantsMojo extends AbstractMojo {
@@ -73,25 +74,45 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	private static final String PACKAGE = "org.eclipse.smarthome.core.thing";
 	private static final ClassName THING_TYPE_UID_CLASS_NAME = ClassName.get(PACKAGE, "ThingTypeUID");
 
-	/** Input directory. */
+	/**
+	 * Input directory.
+	 *
+	 * @since 0.1.0
+	 */
 	@Parameter(property = "esh-constants.inputDirectory",
 			defaultValue = "${project.basedir}/src/main/resources/ESH-INF")
 	private String inputDirectory;
 
-	/** Output directory for constant classes. */
+	/**
+	 * Output directory for constant classes.
+	 *
+	 * @since 0.1.0
+	 */
 	@Parameter(property = "esh-constants.outputDirectory",
 			defaultValue = "${project.build.directory}/generated-sources/esh-constants")
 	private String outputDirectory;
 
-	/** Package name for constant classes. */
+	/**
+	 * Package name for constant classes.
+	 *
+	 * @since 0.1.0
+	 */
 	@Parameter(property = "esh-constants.packageName", required = true)
 	private String packageName;
 
-	/** Class name for openHAB constants. */
+	/**
+	 * Class name for openHAB constants.
+	 *
+	 * @since 0.1.11
+	 */
 	@Parameter(property = "esh-constants.openhabClassName", required = true)
 	private String openhabClassName;
 
-	/** Class name for string constants. */
+	/**
+	 * Class name for string constants.
+	 *
+	 * @since 0.1.11
+	 */
 	@Parameter(property = "esh-constants.stringsClassName", required = true)
 	private String stringsClassName;
 
