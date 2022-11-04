@@ -75,12 +75,9 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
 		<maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+		<maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
 
 		<maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-
-		<checkstyle.config.location>checkstyle.xml</checkstyle.config.location>
-		<checkstyle.suppressions.location>checkstyle-suppression.xml</checkstyle.suppressions.location>
-		<checkstyle.includeTestSourceDirectory>true</checkstyle.includeTestSourceDirectory>
 
 		<!-- ===================================================================== -->
 		<!-- ============================= Versions ============================== -->
@@ -91,7 +88,7 @@
 		<version.org.apache.maven.plugins.checkstyle>3.2.0</version.org.apache.maven.plugins.checkstyle>
 		<version.org.apache.maven.plugins.clean>3.2.0</version.org.apache.maven.plugins.clean>
 		<version.org.apache.maven.plugins.compiler>3.10.1</version.org.apache.maven.plugins.compiler>
-		<version.org.apache.maven.plugins.dependency_>3.3.0</version.org.apache.maven.plugins.dependency_>
+		<version.org.apache.maven.plugins.dependency>3.3.0</version.org.apache.maven.plugins.dependency>
 		<version.org.apache.maven.plugins.deploy>3.0.0</version.org.apache.maven.plugins.deploy>
 		<version.org.apache.maven.plugins.gpg>3.0.1</version.org.apache.maven.plugins.gpg>
 		<version.org.apache.maven.plugins.install>3.0.1</version.org.apache.maven.plugins.install>
@@ -112,7 +109,6 @@
 
 		<version.org.apache.maven.plugin.tools>3.6.4</version.org.apache.maven.plugin.tools>
 		<version.org.junit.jupiter>5.9.1</version.org.junit.jupiter>
-		<version.org.mockito>4.8.1</version.org.mockito>
 		<version.com.google.testing.compile>0.19</version.com.google.testing.compile>
 		<version.com.squareup.javapoet>1.13.0</version.com.squareup.javapoet>
 
@@ -127,6 +123,17 @@
 				<artifactId>maven-plugin-api</artifactId>
 				<version>${project.prerequisites.maven}</version>
 				<scope>provided</scope>
+				<exclusions>
+					<!-- do not pollute compile classpath with transitive dependencies -->
+					<exclusion>
+						<groupId>org.eclipse.sisu</groupId>
+						<artifactId>org.eclipse.sisu.plexus</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-utils</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven.plugin-tools</groupId>
@@ -188,11 +195,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.google.testing.compile</groupId>
 			<artifactId>compile-testing</artifactId>
 			<scope>test</scope>
@@ -207,6 +209,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>${version.org.apache.maven.plugins.checkstyle}</version>
+					<configuration>
+						<configLocation>checkstyle.xml</configLocation>
+						<suppressionsLocation>checkstyle-suppression.xml</suppressionsLocation>
+						<includeTestSourceDirectory>true</includeTestSourceDirectory>
+					</configuration>
 					<dependencies>
 						<dependency>
 							<groupId>com.puppycrawl.tools</groupId>
@@ -235,7 +242,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.dependency_}</version>
+					<version>${version.org.apache.maven.plugins.dependency}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -259,18 +266,21 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.javadoc}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>${version.org.apache.maven.plugins.jar}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${version.org.apache.maven.plugins.javadoc}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-plugin-plugin</artifactId>
 					<version>${version.org.apache.maven.plugin.tools}</version>
+					<configuration>
+						<extractors>java-annotations</extractors>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
