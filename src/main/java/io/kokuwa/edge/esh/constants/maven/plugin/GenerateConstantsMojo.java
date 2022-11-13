@@ -150,6 +150,8 @@ public class GenerateConstantsMojo extends AbstractMojo {
 						.initializer("$S", bindingId)
 						.build())
 				.addFields(mapConstants(properties, "PROPERTY_"))
+				.addFields(mapConstants(thingTypeIDs.stream().map(type -> bindingId + ":" + type).collect(Collectors.toList()), "UID_"))
+				.addFields(mapConstants(bridgeTypeIDs.stream().map(type -> bindingId + ":" + type).collect(Collectors.toList()), "UID_"))
 				.addFields(mapConstants(thingTypeIDs, "THING_TYPE_ID_"))
 				.addFields(mapConstants(bridgeTypeIDs, "BRIDGE_TYPE_ID_"))
 				.addFields(mapConstants(channelIDs, "CID_"))

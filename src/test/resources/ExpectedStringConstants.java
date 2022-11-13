@@ -7,6 +7,25 @@ public final class StringConstants {
 
   public static final String PROPERTY_SERIAL = "serial";
 
+  // ThingTypeUID Strings
+  public static final String UID_WMBUS_ITRON_SMOKE_DETECTOR = "wmbus:itron_smoke_detector";
+  public static final String UID_WMBUS_TECHEM_HKV45 = "wmbus:techem_hkv45";
+  public static final String UID_WMBUS_TECHEM_HKV61 = "wmbus:techem_hkv61";
+  public static final String UID_WMBUS_TECHEM_HKV64 = "wmbus:techem_hkv64";
+  public static final String UID_WMBUS_TECHEM_HKV69 = "wmbus:techem_hkv69";
+  public static final String UID_WMBUS_TECHEM_HKV94 = "wmbus:techem_hkv94";
+  public static final String UID_WMBUS_TECHEM_SD76 = "wmbus:techem_sd76";
+  public static final String UID_WMBUS_TECHEM_WZ62 = "wmbus:techem_wz62";
+  public static final String UID_WMBUS_TECHEM_WZ72 = "wmbus:techem_wz72";
+  public static final String UID_WMBUS_TECHEM_WMZ43 = "wmbus:techem_wmz43";
+  public static final String UID_WMBUS_METER = "wmbus:meter";
+  public static final String UID_WMBUS_ENCRYPTED_METER = "wmbus:encrypted_meter";
+  public static final String UID_WMBUS_THING_WITH_GROUPS = "wmbus:thing_with_groups";
+  public static final String UID_WMBUS_EGO_TCP = "wmbus:ego-tcp";
+  public static final String UID_WMBUS_WMBUSBRIDGE = "wmbus:wmbusbridge";
+  public static final String UID_WMBUS_WMBUSVIRTUALBRIDGE = "wmbus:wmbusvirtualbridge";
+
+  // Constants
   public static final String THING_TYPE_ID_EGO_TCP = "ego-tcp";
 
   public static final String THING_TYPE_ID_ENCRYPTED_METER = "encrypted_meter";
