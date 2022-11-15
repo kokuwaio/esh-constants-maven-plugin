@@ -37,6 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -142,21 +143,44 @@ public class GenerateConstantsMojo extends AbstractMojo {
 
 		String bindingId = bindingIDs.iterator().next();
 
-		TypeSpec stringConstantsClass = TypeSpec.classBuilder(stringsClassName)
-				.addModifiers(PUBLIC, FINAL)
-				.addMethod(MethodSpec.constructorBuilder().addModifiers(PRIVATE).build())
-				.addField(FieldSpec
-						.builder(String.class, "BINDING_ID", PUBLIC, STATIC, FINAL)
-						.initializer("$S", bindingId)
-						.build())
-				.addFields(mapConstants(properties, "PROPERTY_"))
-				.addFields(mapConstants(thingTypeIDs, "THING_TYPE_ID_"))
-				.addFields(mapConstants(bridgeTypeIDs, "BRIDGE_TYPE_ID_"))
-				.addFields(mapConstants(channelIDs, "CID_"))
-				.addFields(mapConstants(channelTypeIDs, "CHANNEL_TYPE_ID_"))
-				.addFields(mapConstants(channelGroupTypeIDs, "CHANNEL_GROUP_TYPE_ID_"))
-				.addFields(mapConstants(channelGroupIDs, "GID_"))
-				.build();
+		TypeSpec stringConstantsClass;
+		try {
+			stringConstantsClass = TypeSpec.classBuilder(stringsClassName)
+					.addModifiers(PUBLIC, FINAL)
+					.addMethod(MethodSpec.constructorBuilder().addModifiers(PRIVATE).build())
+					.addField(FieldSpec
+									.builder(String.class, "BINDING_ID", PUBLIC, STATIC, FINAL)
+									.initializer("$S", bindingId)
+									.build())
+					.addFields(mapConstants(properties, "PROPERTY_"))
+					.addFields(mapConstants(thingTypeIDs.stream().map(type -> bindingId + ":" + type)
+									.collect(Collectors.toList()), "UID_"))
+					.addFields(mapConstants(bridgeTypeIDs.stream().map(type -> bindingId + ":" + type)
+									.collect(Collectors.toList()), "UID_"))
+					.addFields(mapConstants(thingTypeIDs, "THING_TYPE_ID_"))
+					.addFields(mapConstants(bridgeTypeIDs, "BRIDGE_TYPE_ID_"))
+					.addFields(deprecated(mapConstants(channelIDs, "CID_")))
+					.addFields(deprecated(mapConstants(channelTypeIDs, "CHANNEL_TYPE_ID_")))
+					.addFields(deprecated(mapConstants(channelGroupTypeIDs, "CHANNEL_GROUP_TYPE_ID_")))
+					.addFields(deprecated(mapConstants(channelGroupIDs, "GID_")))
+					.addFields(mapConstants(scanDocuments(inputFiles,
+							"//bridge-type/channels/channel/@id | //thing-type/channels/channel/@id"), "GCID_"))
+					// add a constant for each channel which is in a group
+					.addFields(mapConstants(channelGroupTypeIDs.stream().flatMap(
+									groupType -> scanDocuments(inputFiles,
+											"//channel-group-type[@id='" + groupType + "']//channel/@id")
+											.stream()
+											.flatMap(groupTypeChannel -> scanDocuments(
+													inputFiles,
+													"//channel-group[@typeId='" + groupType + "']/@id")
+													.stream()
+													.map(group -> group + "#" + groupTypeChannel)))
+							.collect(Collectors.toCollection(LinkedHashSet::new)), "GCID_"))
+
+					.build();
+		} catch (RuntimeException exception) {
+			throw new MojoExecutionException("Can't generate string constants class", exception);
+		}
 
 		try {
 			JavaFile.builder(packageName, stringConstantsClass)
@@ -225,7 +249,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	 * @return A {@link Set} of strings matching the XPath
 	 * @throws MojoExecutionException on error, execution fails
 	 */
-	private List<String> scanDocuments(Set<Path> inputFiles, String expression) throws MojoExecutionException {
+	private List<String> scanDocuments(Set<Path> inputFiles, String expression) {
 		final Set<String> result = new LinkedHashSet<>();
 		for (Path inputFile : inputFiles) {
 			result.addAll(scanDocument(inputFile.toFile(), expression));
@@ -241,7 +265,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 	 * @return A {@link Set} of strings matching the XPath
 	 * @throws MojoExecutionException on error, execution fails
 	 */
-	private Set<String> scanDocument(File file, String expression) throws MojoExecutionException {
+	private Set<String> scanDocument(File file, String expression) {
 
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -263,7 +287,7 @@ public class GenerateConstantsMojo extends AbstractMojo {
 			}
 			return result;
 		} catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException e) {
-			throw new MojoExecutionException("Unable to parse XML document: " + file, e);
+			throw new RuntimeException("Unable to parse XML document: " + file, e);
 		}
 	}
 
@@ -278,8 +302,20 @@ public class GenerateConstantsMojo extends AbstractMojo {
 				.build();
 	}
 
-	private Iterable<FieldSpec> mapConstants(Collection<String> input, String prefix) {
+	private List<FieldSpec> mapConstants(Collection<String> input, String prefix) {
 		return input.stream().map(p -> stringConstant(prefix, p)).collect(Collectors.toList());
+	}
+
+	/**
+	 * {@code List<FieldSpec>} decorator that adds a @{@link Deprecated} annotation to all fields.
+	 */
+	private List<FieldSpec> deprecated(List<FieldSpec> delegates) {
+		return delegates.stream()
+				.map(field ->
+						field.toBuilder()
+								.addAnnotation(AnnotationSpec.builder(Deprecated.class)
+								.addMember("forRemoval", "true").build()).build())
+				.collect(Collectors.toList());
 	}
 
 	private FieldSpec thingTypeUidSpec(String id, String prefix) {
