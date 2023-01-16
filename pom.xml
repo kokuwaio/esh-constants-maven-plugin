@@ -107,7 +107,7 @@
 
 		<!-- dependencies -->
 
-		<version.org.apache.maven.plugin.tools>3.7.0</version.org.apache.maven.plugin.tools>
+		<version.org.apache.maven.plugin.tools>3.7.1</version.org.apache.maven.plugin.tools>
 		<version.org.junit.jupiter>5.9.2</version.org.junit.jupiter>
 		<version.com.google.testing.compile>0.21.0</version.com.google.testing.compile>
 		<version.com.squareup.javapoet>1.13.0</version.com.squareup.javapoet>
