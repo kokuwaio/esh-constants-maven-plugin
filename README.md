@@ -1,7 +1,7 @@
 # ESH Constants Generator Maven Plugin
 
 [![License](https://img.shields.io/github/license/kokuwaio/esh-constants-maven-plugin.svg?label=License)](https://github.com/kokuwaio/esh-constants-maven-plugin/blob/main/LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/io.kokuwa.edge/esh-constants-maven-plugin?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.kokuwa.edge%22%20AND%20a:%22esh-constants-maven-plugin%22)
+[![Maven Central](https://img.shields.io/maven-central/v/io.kokuwa.edge/esh-constants-maven-plugin?label=Maven%20Central)](https://central.sonatype.com/namespace/io.kokuwa.maven)
 [![CI](https://img.shields.io/github/actions/workflow/status/kokuwaio/esh-constants-maven-plugin/ci.yaml?branch=main&label=CI)](https://github.com/kokuwaio/esh-constants-maven-plugin/actions/workflows/ci.yaml?label=CI)
 
 ## What?
