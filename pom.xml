@@ -17,8 +17,9 @@
 	</organization>
 	<licenses>
 		<license>
-			<name>MIT License</name>
-			<url>http://opensource.org/licenses/MIT</url>
+			<name>Apache-2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
 		</license>
 	</licenses>
 
@@ -60,6 +61,12 @@
 			<id>sonatype-nexus</id>
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
+		<relocation>
+			<groupId>io.kokuwa.maven</groupId>
+			<artifactId>esh-constants-maven-plugin</artifactId>
+			<version>0.2.0</version>
+			<message>fixed groupId and message</message>
+		</relocation>
 	</distributionManagement>
 
 	<properties>
@@ -357,6 +364,7 @@
 							<writeJunitReport>true</writeJunitReport>
 							<scope>none</scope>
 							<addTestClassPath>true</addTestClassPath>
+							<skipInvocation>true</skipInvocation>
 						</configuration>
 					</execution>
 				</executions>
