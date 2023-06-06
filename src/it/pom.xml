@@ -84,7 +84,7 @@
 					<version>${version.org.codehaus.mojo.tidy}</version>
 				</plugin>
 				<plugin>
-					<groupId>io.kokuwa.edge</groupId>
+					<groupId>io.kokuwa.maven</groupId>
 					<artifactId>esh-constants-maven-plugin</artifactId>
 					<version>${version.io.kokuwa.maven.esh-constants}</version>
 				</plugin>
