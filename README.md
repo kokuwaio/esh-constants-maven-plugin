@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/kokuwaio/esh-constants-maven-plugin.svg?label=License)](https://github.com/kokuwaio/esh-constants-maven-plugin/blob/main/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/io.kokuwa.edge/esh-constants-maven-plugin?label=Maven%20Central)](https://central.sonatype.com/namespace/io.kokuwa.maven)
-[![CI](https://img.shields.io/github/actions/workflow/status/kokuwaio/esh-constants-maven-plugin/ci.yaml?branch=main&label=CI)](https://github.com/kokuwaio/esh-constants-maven-plugin/actions/workflows/ci.yaml?label=CI)
+[![Build](https://img.shields.io/github/actions/workflow/status/kokuwaio/esh-constants-maven-plugin/build.yaml?label=Build)](https://github.com/kokuwaio/esh-constants-maven-plugin/actions/workflows/build.yaml?label=Build)
 
 ## What?
 
